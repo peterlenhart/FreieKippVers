@@ -125,13 +125,15 @@
     #edelstein {
       position: absolute;
       width: 85px;
-      height: 170px;
+      height: 85px;
       left: 50%;
       top: 540px;
       transform: translateX(-50%);
       cursor: pointer;
       z-index: 300;
       animation: pulsate 1.5s ease-in-out infinite;
+      object-fit: none;
+      object-position: top;
     }
     
     @keyframes pulsate {
@@ -1240,30 +1242,12 @@
         actionButton.textContent = 'weiter';
         actionButton.style.opacity = '0';
         actionButton.style.display = 'block';
-        countdown.textContent = '0';
-        countdown.style.opacity = '0';
-        countdown.style.display = 'block';
 
         // requestAnimationFrame damit display:block erstmal greift
         requestAnimationFrame(() => {
           actionButton.style.transition = 'opacity 0.4s ease';
-          countdown.style.transition = 'opacity 0.4s ease';
           actionButton.style.opacity = '1';
-          countdown.style.opacity = '1';
         });
-
-        // Zähler bis 30
-        let elapsed = 0;
-        pauseTimerRef = setInterval(() => {
-          elapsed++;
-          totalObservationTime++; // Beobachtungszeit tracken
-          countdown.textContent = elapsed;
-          if (elapsed >= 30) {
-            clearInterval(pauseTimerRef);
-            pauseTimerRef = null;
-            endPausePhase();
-          }
-        }, 1000);
       });
     }
 
@@ -1277,14 +1261,11 @@
       // UI faden aus
       hintText.style.transition = 'opacity 0.35s ease';
       actionButton.style.transition = 'opacity 0.35s ease';
-      countdown.style.transition = 'opacity 0.35s ease';
       hintText.style.opacity = '0';
       actionButton.style.opacity = '0';
-      countdown.style.opacity = '0';
       setTimeout(() => {
         hintText.style.display = 'none';
         actionButton.style.display = 'none';
-        countdown.style.display = 'none';
       }, 350);
 
       // Schritt 1: Aufrichten von aktueller Position auf senkrecht (alpha=0, beta=0)
@@ -1480,18 +1461,7 @@
     let isDemoAnimating = false;
     
     function startCountdown(onFinish) {
-      let elapsed = 0;
-      countdown.textContent = elapsed;
-      countdown.style.display = 'block';
-      
-      countdownTimer = setInterval(() => {
-        elapsed++;
-        countdown.textContent = elapsed;
-        if (elapsed >= 60) {
-          stopCountdown();
-          if (onFinish) onFinish();
-        }
-      }, 1000);
+      // Timer deaktiviert
     }
     
     function stopCountdown() {
@@ -1499,12 +1469,9 @@
         clearInterval(countdownTimer);
         countdownTimer = null;
       }
-      countdown.style.display = 'none';
     }
     
-    // Zähler anzeigen aber noch nicht starten (startet bei erster Berührung)
-    countdown.textContent = 0;
-    countdown.style.display = 'none'; // Versteckt in Demo-Phase
+    // Timer deaktiviert
     let timerStarted = false;
 
     // =========================
@@ -1761,28 +1728,22 @@
       kippCount = 0;
       
       // UI zurücksetzen zu Phase 2
-      hintText.style.display = 'block';
-      hintText.innerHTML = 'KIPPEN<br>SCHAUEN<br>MERKEN';
-      actionButton.textContent = 'weiter';
-      actionButton.style.display = 'block';
-      actionButton.classList.remove('pulse');
+      hintText.style.display = 'none';
+      actionButton.style.display = 'none';
+      countdown.style.display = 'none';
+      document.getElementById('instructionText').style.display = 'block';
+      document.getElementById('edelstein').style.display = 'block';
       kippButtons.classList.add('hidden');
       document.getElementById('richtungButtons').classList.add('hidden');
       
       // Kärtchen verstecken
       gameCards.forEach(c => c.mesh.visible = false);
-      // shadowGradPlane.visible = false; // Schatten entfernt
       
       // Würfel zurücksetzen zu Q3
       cube.position.set(-offset, offset, 0.109375 + offset);
       cube.rotation.set(0, 0, 0);
       currentQuadrant = 3;
       topFace = 'f2'; // Anfangslage zurücksetzen
-      
-      // Countdown neu starten für Phase 2
-      timerStarted = false;
-      countdown.textContent = 0;
-      countdown.style.display = 'block';
       
     });
 
@@ -1957,15 +1918,7 @@
       if (currentMode === 'kanten' && gamePhase === 'kippen') {
         if (isAnimating) return;
         e.preventDefault();
-        // Zähler beim ersten Kipp starten
-        if (!timerStarted) {
-          timerStarted = true;
-          startCountdown(() => {
-            if (gamePhase === 'kippen') {
-              phaseKippenToSpielen();
-            }
-          });
-        }
+        
         const touch = e.touches[0];
         swipeStartX = touch.clientX;
         swipeStartY = touch.clientY;
@@ -2174,16 +2127,7 @@
         gamePhase = 'kippen';
         handDemo.visible = false; // Hand sofort ausblenden
         
-        // UI nach kurzer Verzögerung updaten
-        setTimeout(() => {
-          hintText.innerHTML = 'KIPPEN<br>SCHAUEN<br>MERKEN';
-          hintText.style.display = 'block';
-          actionButton.textContent = 'weiter';
-          actionButton.style.display = 'block';
-          countdown.style.display = 'block';
-        }, 50);
-        
-        return; // WICHTIG: Erst beim NÄCHSTEN Click darf gekippt werden
+        return; // Anleitung und Edelstein sind bereits sichtbar
       }
     });
     
