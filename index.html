@@ -121,6 +121,21 @@
       display: block;
     }
     
+    #tutorialText {
+      position: absolute;
+      top: 477px;
+      left: 10px;
+      width: 340px;
+      text-align: left;
+      font-size: 11pt;
+      font-family: Arial, sans-serif;
+      color: #d4b48c;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      pointer-events: none;
+      line-height: 1.4;
+      display: none;
+    }
+    
     #verdecktesKippziel {
       position: absolute;
       width: 45px;
@@ -334,6 +349,7 @@
     <div id="hintText"></div>
     <div id="instructionText">Kippe den Würfel in der Box in beliebige Richtung und langsam von Ecke zu Ecke. Merke dir möglichst viele Zahlenpositionen.<br>Wenn du bereit bist, dann decke hier links dein erstes von sechs KIPP-Zielen auf.</div>
     <img id="verdecktesKippziel" src="leernohit.webp" style="display:none;">
+    <div id="tutorialText"></div>
     <div id="brainScore"></div>
     <div id="countdown">60</div>
     <button id="actionButton">weiter</button>
@@ -1695,8 +1711,26 @@
       document.getElementById('instructionText').style.display = 'none';
       verdecktesMesh.visible = false;
       verdecktesMesh.userData.revealed = false;
-      document.getElementById('richtungButtons').classList.remove('hidden');
-      kippButtons.classList.remove('hidden');
+      
+      // Buttons UNSICHTBAR und INAKTIV lassen
+      document.getElementById('richtungButtons').classList.add('hidden');
+      kippButtons.classList.add('hidden');
+      
+      // Richtungs-Lock zurücksetzen
+      lockedKippDir = null;
+      currentDragDir = null;
+      
+      // Tutorial-Text mit aktuellem Kippziel anzeigen
+      const tutText = document.getElementById('tutorialText');
+      if (erstesKippziel) {
+        const zahl = erstesKippziel.zahl;
+        const farbe = FARB_DISPLAY[erstesKippziel.color.name] || erstesKippziel.color.name;
+        tutText.innerHTML = '<b>ÜBERLEGE &amp; ENTSCHEIDE</b><br>' +
+          'Wie oft und in welche Richtung musst du den Würfel kippen, damit ' + zahl + ' neben ' + farbe + ' liegt?<br>' +
+          'Ist deine Entscheidung fix? Dann kippe zügig, wie geplant. Zügige, entschlossene Kippzüge werden erkannt und erhöhen am Ende deinen BRAIN SCORE WERT.<br>' +
+          '<i>Kipprichtung: Nach Ankipp, Gegenrichtung gesperrt.</i>';
+      }
+      tutText.style.display = 'block';
 
       // Kärtchen werden in fillAllCards() sichtbar gemacht - NICHT hier
 
@@ -1837,11 +1871,14 @@
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
       document.getElementById('instructionText').style.display = 'block';
+      document.getElementById('tutorialText').style.display = 'none';
       verdecktesMesh.visible = true;
       verdecktesMesh.userData.revealed = false;
       verdecktesMesh.scale.set(1, 1, 1);
       verdecktesMat.opacity = 1;
       erstesKippziel = null;
+      lockedKippDir = null;
+      currentDragDir = null;
       drawLeernohitOnVerdecktes();
       kippButtons.classList.add('hidden');
       document.getElementById('richtungButtons').classList.add('hidden');
@@ -2025,7 +2062,7 @@
         pauseDragActive = true;
         return;
       }
-      if (currentMode === 'kanten' && gamePhase === 'kippen') {
+      if (currentMode === 'kanten' && (gamePhase === 'kippen' || gamePhase === 'spielen')) {
         if (isAnimating) return;
         e.preventDefault();
         
@@ -2068,7 +2105,7 @@
         pausePivotGroup.rotation.set(pauseAlpha, pauseBeta, 0, 'YXZ');
         return;
       }
-      if (!isSwiping || isAnimating || gamePhase !== 'kippen' || currentMode !== 'kanten') return;
+      if (!isSwiping || isAnimating || (gamePhase !== 'kippen' && gamePhase !== 'spielen') || currentMode !== 'kanten') return;
       e.preventDefault();
 
       const touch = e.touches[0];
@@ -2081,6 +2118,13 @@
 
         const direction = getValidDirection(deltaX, deltaY);
         if (!direction) { isSwiping = false; return; }
+        
+        // In Spielphase: gesperrte Gegenrichtung prüfen
+        if (gamePhase === 'spielen' && lockedKippDir) {
+          if (lockedKippDir === 'cw' && CCW_DIRS.has(direction)) { isSwiping = false; return; }
+          if (lockedKippDir === 'ccw' && CW_DIRS.has(direction)) { isSwiping = false; return; }
+        }
+        currentDragDir = direction;
 
         const config = getKippConfig(direction);
         dragAxis = config.axis;
@@ -2141,8 +2185,9 @@
       currentQuadrant = savedCurrentQuadrant;
 
       gamePhase = 'spielen';
-      document.getElementById('richtungButtons').classList.remove('hidden');
-      kippButtons.classList.remove('hidden');
+      // Buttons bleiben versteckt (Tutorial-Modus: Swipe-Kipping)
+      document.getElementById('richtungButtons').classList.add('hidden');
+      kippButtons.classList.add('hidden');
 
       // Pause-Lichter aus
       pauseLights.forEach(l => l.visible = false);
@@ -2221,6 +2266,16 @@
           } else {
             // Gekippt: finalisieren
             finalizeKipp(finalQ, null);
+            
+            // In Spielphase: Richtung sperren und topFace aktualisieren
+            if (gamePhase === 'spielen' && currentDragDir) {
+              const isCW = CW_DIRS.has(currentDragDir);
+              if (!lockedKippDir) {
+                lockedKippDir = isCW ? 'cw' : 'ccw';
+              }
+              kippDirection = isCW ? 'cw' : 'ccw';
+              advanceTopFace();
+            }
           }
           dragActive = false;
           dragPivotGroup = null;
@@ -2405,6 +2460,17 @@
     // =========================
     // CW/CCW Richtung
     let kippDirection = 'cw';
+    
+    // Richtungsklassifizierung für Swipe-Kipping
+    const CW_DIRS = new Set(['east', 'south_from_q1', 'west_from_q2', 'north']);
+    const CCW_DIRS = new Set(['south', 'west', 'north_from_q2', 'east_from_q3']);
+    let lockedKippDir = null; // null, 'cw', 'ccw'
+    let currentDragDir = null;
+    
+    // Farbnamen für Tutorial-Anzeige
+    const FARB_DISPLAY = {
+      'violett': 'Violett', 'blau': 'Blau', 'gruen': 'Grün', 'orange': 'Orange'
+    };
     const cwBtn = document.getElementById('cwBtn');
     const ccwBtn = document.getElementById('ccwBtn');
 
