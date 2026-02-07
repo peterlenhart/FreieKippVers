@@ -319,6 +319,35 @@
       box-shadow: 0 0 8px rgba(212,180,140,0.6), 0 0 20px rgba(212,180,140,0.35), inset 0 0 6px rgba(212,180,140,0.15);
     }
 
+    #resetButton {
+      display: none;
+      position: absolute;
+      top: 195px;
+      left: 22px;
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(180deg, #606060 0%, #404040 100%);
+      border: 2px solid #808080;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #c0b8a8;
+      cursor: pointer;
+      pointer-events: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.8);
+      transition: all 0.15s ease;
+      z-index: 200;
+      padding: 0;
+      line-height: 45px;
+      text-align: center;
+    }
+
+    #resetButton:active {
+      transform: scale(0.95);
+      background: linear-gradient(180deg, #505050 0%, #303030 100%);
+    }
+
     #backButton {
       display: none;
       position: absolute;
@@ -377,6 +406,7 @@
     <div id="countdown">60</div>
     <button id="actionButton">weiter</button>
     <button id="backButton">↻</button>
+    <button id="resetButton">←</button>
     
     <div id="richtungButtons" class="hidden" style="position:absolute;top:540px;left:50%;transform:translateX(-50%);display:flex;gap:21px;width:180px;z-index:200;">
       <button id="cwBtn" class="kippBtn" style="flex:1;height:45px;font-size:40px;line-height:1;position:relative;"><span style="position:absolute;top:calc(50% - 3px);left:50%;transform:translate(-50%,-50%);font-size:40px;">↻</span></button>
@@ -978,6 +1008,7 @@
     const countdown = document.getElementById('countdown');
     const actionButton = document.getElementById('actionButton');
     const backButton = document.getElementById('backButton');
+    const resetButton = document.getElementById('resetButton');
     const kippButtons = document.getElementById('kippButtons');
     
     // WICHTIG: Button disabled bis Texturen geladen sind
@@ -991,7 +1022,9 @@
     function advanceTopFace() {
       const cw  = { f2: 'f0', f0: 'f1', f1: 'f2' };
       const ccw = { f2: 'f1', f1: 'f0', f0: 'f2' };
+      const oldFace = topFace;
       topFace = (kippDirection === 'cw') ? cw[topFace] : ccw[topFace];
+      console.log('advanceTopFace:', oldFace, '→', topFace, 'dir:', kippDirection, 'Q:', currentQuadrant);
     }
 
     // Welche Nachbarfarbe hat jeder Slot pro Quadrant
@@ -1803,6 +1836,7 @@
     function spielzielToDemoPhase() {
       gamePhase = 'demo';
       document.getElementById('spielZielText').style.display = 'none';
+      resetButton.style.display = 'block';
       
       // Unsichtbarer Spacer für Text-Umfluss um animierte 3D-Hand
       const instrText = document.getElementById('instructionText');
@@ -1839,7 +1873,11 @@
       currentMode = 'kanten';
       kippzielChecked = false;
       
-      // Würfel bleibt in aktueller Position/Lage (kein Reset!)
+      // Würfel auf Startposition Q3/f2 zurücksetzen
+      cube.quaternion.set(0, 0, 0, 1);
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      currentQuadrant = 3;
+      topFace = 'f2';
 
       // Countdown STOPPEN
       stopCountdown();
@@ -2007,14 +2045,7 @@
     // Desktop-Klick Fallback
     renderer.domElement.addEventListener('click', (e) => {
       if (gamePhase === 'spielen' && !kippzielChecked) {
-        // Tap auf Würfel → Kippziel prüfen
-        const rect = renderer.domElement.getBoundingClientRect();
-        vkMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-        vkMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        vkRaycaster.setFromCamera(vkMouse, camera);
-        if (vkRaycaster.intersectObject(cube).length > 0) {
-          checkKippzielTap();
-        }
+        checkKippzielTap();
         return;
       }
       if (gamePhase !== 'kippen' || !verdecktesMesh.visible || verdecktesMesh.userData.revealed) return;
@@ -2030,15 +2061,9 @@
     // Tap-auf-Würfel für Touch
     renderer.domElement.addEventListener('touchend', (e) => {
       if (gamePhase === 'spielen' && !kippzielChecked && !dragActive && lastTouchPos) {
-        const rect = renderer.domElement.getBoundingClientRect();
-        vkMouse.x = ((lastTouchPos.x - rect.left) / rect.width) * 2 - 1;
-        vkMouse.y = -((lastTouchPos.y - rect.top) / rect.height) * 2 + 1;
-        vkRaycaster.setFromCamera(vkMouse, camera);
-        if (vkRaycaster.intersectObject(cube).length > 0) {
-          checkKippzielTap();
-          lastTouchPos = null;
-          return;
-        }
+        checkKippzielTap();
+        lastTouchPos = null;
+        return;
       }
     }, { passive: true });
     
@@ -2062,6 +2087,14 @@
         const neighborColor = SLOT_NEIGHBOR_COLORS[currentQuadrant][hitSlot];
         isHit = (neighborColor === erstesKippziel.color.name);
       }
+      
+      console.log('=== KIPPZIEL TAP ===');
+      console.log('Ziel:', erstesKippziel.zahl, erstesKippziel.color.name);
+      console.log('topFace:', topFace, 'currentQuadrant:', currentQuadrant);
+      console.log('Sichtbare Slots:', JSON.stringify(visible));
+      console.log('hitSlot:', hitSlot);
+      if (hitSlot) console.log('Farbe an Slot:', SLOT_NEIGHBOR_COLORS[currentQuadrant][hitSlot]);
+      console.log('Ergebnis:', isHit ? 'TREFFER' : 'MISS');
       
       // Visuelles Feedback auf verdecktesMesh Canvas
       drawKippzielBorder(isHit);
@@ -2176,6 +2209,38 @@
       currentQuadrant = 3;
       topFace = 'f2'; // Anfangslage zurücksetzen
       
+    });
+    
+    // Reset-Button: Zurück zu SPIEL ZIEL
+    resetButton.addEventListener('click', () => {
+      stopCountdown();
+      countdown.style.display = 'none';
+      isDemoAnimating = false;
+      handDemo.visible = false;
+      
+      document.getElementById('instructionText').style.display = 'none';
+      document.getElementById('tutorialText').style.display = 'none';
+      hintText.style.display = 'none';
+      actionButton.style.display = 'none';
+      kippButtons.classList.add('hidden');
+      document.getElementById('richtungButtons').classList.add('hidden');
+      resetButton.style.display = 'none';
+      
+      gameCards.forEach(c => c.mesh.visible = false);
+      
+      cube.quaternion.set(0, 0, 0, 1);
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      currentQuadrant = 3;
+      topFace = 'f2';
+      kippCount = 0;
+      lockedKippDir = null;
+      currentDragDir = null;
+      erstesKippziel = null;
+      kippzielChecked = false;
+      totalObservationTime = 0;
+      
+      gamePhase = 'spielziel';
+      initSpielzielPhase();
     });
 
     // =========================
