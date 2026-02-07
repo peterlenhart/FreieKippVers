@@ -808,25 +808,6 @@
     scene.add(handDemo);
 
     // =========================
-    // SILBERNER KREIS in Box-Mitte
-    // =========================
-    const kreisRadius = 0.08;
-    const kreisGeometry = new THREE.CircleGeometry(kreisRadius, 32);
-    const kreisMaterial = new THREE.MeshStandardMaterial({
-      color: 0xc0c0c0,
-      metalness: 0.8,
-      roughness: 0.2,
-      transparent: true,
-      opacity: 0.85
-    });
-    const kreisMesh = new THREE.Mesh(kreisGeometry, kreisMaterial);
-    kreisMesh.rotation.x = -Math.PI / 2;
-    // Mitte der Box: x=0, z=0.109375 (wo 4 Quadranten sich treffen), knapp über Grid
-    kreisMesh.position.set(0, 0.001 + 3 * 0.15625 + 0.003, 0.109375);
-    kreisMesh.visible = false;
-    scene.add(kreisMesh);
-
-    // =========================
     // WÜRFEL mit 3x3 Grid-Textur
     // =========================
     // Würfel-Textur WebP (für f0, f1, f2)
@@ -1874,6 +1855,7 @@
     function phaseKippenToSpielen() {
       gamePhase = 'spielen';
       currentMode = 'kanten';
+      kippzielChecked = false;
       
       // Würfel bleibt in aktueller Position/Lage (kein Reset!)
 
@@ -1900,12 +1882,9 @@
       if (erstesKippziel) {
         const zahl = erstesKippziel.zahl;
         const farbe = FARB_DISPLAY[erstesKippziel.color.name] || erstesKippziel.color.name;
-        tutText.innerHTML = 'Überlege: Wie oft und in welche Richtung musst du kippen, damit ' + zahl + ' an ' + farbe + ' liegt?<br><i>Erste Kipprichtung gilt, Umkehr gesperrt.</i><br>Kippe zügig, sonst zählt der Timer SCHAU-Sekunden, und dein Kippziel verfällt (nicht erkippt).<br><br>Mit KLICK auf den Kreis im Zentrum loggst du deinen Kippzug ein.';
+        tutText.innerHTML = 'Überlege: Wie oft und in welche Richtung musst du kippen, damit ' + zahl + ' an ' + farbe + ' liegt?<br><i>Erste Kipprichtung gilt, Umkehr gesperrt.</i><br>Kippe zügig, sonst zählt der Timer SCHAU-Sekunden, und dein Kippziel verfällt (nicht erkippt).<br><br>Mit TAP auf den Würfel loggst du deinen Kippzug ein.';
       }
       tutText.style.display = 'block';
-      
-      // Silbernen Kreis anzeigen
-      kreisMesh.visible = true;
       
       // Kipp-Timer "00" anzeigen (gleiche Position wie weiter-Button)
       countdown.textContent = '00';
@@ -2045,6 +2024,17 @@
     
     // Desktop-Klick Fallback
     renderer.domElement.addEventListener('click', (e) => {
+      if (gamePhase === 'spielen' && !kippzielChecked) {
+        // Tap auf Würfel → Kippziel prüfen
+        const rect = renderer.domElement.getBoundingClientRect();
+        vkMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        vkMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        vkRaycaster.setFromCamera(vkMouse, camera);
+        if (vkRaycaster.intersectObject(cube).length > 0) {
+          checkKippzielTap();
+        }
+        return;
+      }
       if (gamePhase !== 'kippen' || !verdecktesMesh.visible || verdecktesMesh.userData.revealed) return;
       const rect = renderer.domElement.getBoundingClientRect();
       vkMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -2054,6 +2044,90 @@
         revealVerdecktesKippziel();
       }
     });
+    
+    // Tap-auf-Würfel auch für Touch
+    let kippzielChecked = false;
+    renderer.domElement.addEventListener('touchend', (e) => {
+      if (gamePhase === 'spielen' && !kippzielChecked && !dragActive && lastTouchPos) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        vkMouse.x = ((lastTouchPos.x - rect.left) / rect.width) * 2 - 1;
+        vkMouse.y = -((lastTouchPos.y - rect.top) / rect.height) * 2 + 1;
+        vkRaycaster.setFromCamera(vkMouse, camera);
+        if (vkRaycaster.intersectObject(cube).length > 0) {
+          checkKippzielTap();
+          lastTouchPos = null;
+          return;
+        }
+      }
+    }, { passive: true });
+    
+    // Kippziel-Check bei Tap auf Würfel
+    function checkKippzielTap() {
+      if (!erstesKippziel || kippzielChecked) return;
+      kippzielChecked = true;
+      
+      // Treffer prüfen (gleiche Logik wie checkTreffer)
+      const faceOff = { f0: 0, f1: 4, f2: 8 };
+      const off = faceOff[topFace];
+      const visible = { S1: deck[off], S2: deck[off+1], S3: deck[off+2], S4: deck[off+3] };
+      
+      let hitSlot = null;
+      for (const [slot, val] of Object.entries(visible)) {
+        if (val === erstesKippziel.zahl) { hitSlot = slot; break; }
+      }
+      
+      let isHit = false;
+      if (hitSlot) {
+        const neighborColor = SLOT_NEIGHBOR_COLORS[currentQuadrant][hitSlot];
+        isHit = (neighborColor === erstesKippziel.color.name);
+      }
+      
+      // Visuelles Feedback auf verdecktesMesh Canvas
+      drawKippzielBorder(isHit);
+    }
+    
+    function drawKippzielBorder(isHit) {
+      const color = isHit ? '#FFD700' : '#FF2020'; // Gelb oder Rot
+      
+      if (!isHit) {
+        // Miss: Bild mit 60% Sättigung neu zeichnen
+        const img = colorTargetImages[erstesKippziel.color.name];
+        if (img) {
+          // Temporäres Canvas für Desaturation
+          const tmpCanvas = document.createElement('canvas');
+          tmpCanvas.width = 85;
+          tmpCanvas.height = 170;
+          const tmpCtx = tmpCanvas.getContext('2d');
+          tmpCtx.drawImage(img, 0, 0, 85, 170);
+          tmpCtx.globalCompositeOperation = 'saturation';
+          tmpCtx.fillStyle = 'hsl(0, 40%, 50%)';
+          tmpCtx.fillRect(0, 0, 85, 170);
+          tmpCtx.globalCompositeOperation = 'source-over';
+          
+          verdecktesCtx.clearRect(0, 0, 85, 170);
+          verdecktesCtx.drawImage(tmpCanvas, 0, 0);
+          
+          // Zahl neu zeichnen
+          const displayText = erstesKippziel.zahl + ((erstesKippziel.zahl === 6 || erstesKippziel.zahl === 9) ? '.' : '');
+          verdecktesCtx.fillStyle = '#2a1810';
+          verdecktesCtx.font = 'bold 56px Arial';
+          verdecktesCtx.textAlign = 'center';
+          verdecktesCtx.textBaseline = 'middle';
+          verdecktesCtx.fillText(displayText, 42, 42);
+        }
+      }
+      
+      // Outline 2px
+      verdecktesCtx.strokeStyle = color;
+      verdecktesCtx.lineWidth = 2;
+      verdecktesCtx.strokeRect(1, 1, 83, 168);
+      
+      // Border 4px inline
+      verdecktesCtx.lineWidth = 4;
+      verdecktesCtx.strokeRect(4, 4, 77, 162);
+      
+      verdecktesCanvasTex.needsUpdate = true;
+    }
 
     backButton.addEventListener('click', () => {
       if (gamePhase !== 'kippen' && gamePhase !== 'spielen') return;
@@ -2066,7 +2140,6 @@
       actionButton.style.display = 'none';
       stopCountdown();
       countdown.style.display = 'none';
-      kreisMesh.visible = false;
       document.getElementById('instructionText').style.display = 'block';
       document.getElementById('tutorialText').style.display = 'none';
       
@@ -2082,6 +2155,7 @@
       verdecktesMesh.scale.set(1, 1, 1);
       verdecktesMat.opacity = 1;
       erstesKippziel = null;
+      kippzielChecked = false;
       lockedKippDir = null;
       currentDragDir = null;
       drawLeernohitOnVerdecktes();
