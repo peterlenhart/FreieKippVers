@@ -322,16 +322,11 @@
     #resetButton {
       display: none;
       position: absolute;
-      top: 195px;
-      left: 22px;
       width: 45px;
       height: 45px;
       background: linear-gradient(180deg, #606060 0%, #404040 100%);
       border: 2px solid #808080;
       border-radius: 8px;
-      font-size: 24px;
-      font-weight: bold;
-      color: #c0b8a8;
       cursor: pointer;
       pointer-events: auto;
       box-shadow: 0 4px 8px rgba(0,0,0,0.4),
@@ -339,13 +334,19 @@
       transition: all 0.15s ease;
       z-index: 200;
       padding: 0;
-      line-height: 45px;
-      text-align: center;
     }
 
     #resetButton:active {
       transform: scale(0.95);
       background: linear-gradient(180deg, #505050 0%, #303030 100%);
+    }
+
+    #resetButton svg {
+      width: 26px;
+      height: 26px;
+      display: block;
+      margin: auto;
+      margin-top: 8px;
     }
 
     #backButton {
@@ -406,7 +407,7 @@
     <div id="countdown">60</div>
     <button id="actionButton">weiter</button>
     <button id="backButton">↻</button>
-    <button id="resetButton">←</button>
+    <button id="resetButton"><svg viewBox="0 0 24 24" fill="none" stroke="#c0b8a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
     
     <div id="richtungButtons" class="hidden" style="position:absolute;top:540px;left:50%;transform:translateX(-50%);display:flex;gap:21px;width:180px;z-index:200;">
       <button id="cwBtn" class="kippBtn" style="flex:1;height:45px;font-size:40px;line-height:1;position:relative;"><span style="position:absolute;top:calc(50% - 3px);left:50%;transform:translate(-50%,-50%);font-size:40px;">↻</span></button>
@@ -1837,6 +1838,13 @@
       gamePhase = 'demo';
       document.getElementById('spielZielText').style.display = 'none';
       resetButton.style.display = 'block';
+      // Position: Rasterzeile 1/2 Grenze, Spalte A (3D → Screen)
+      const resetPos3D = new THREE.Vector3(-0.625, 0.46875, -0.828125 + 0.15625);
+      resetPos3D.project(camera);
+      const resetScreenX = (resetPos3D.x * 0.5 + 0.5) * 360;
+      const resetScreenY = (-resetPos3D.y * 0.5 + 0.5) * 720;
+      resetButton.style.left = (resetScreenX - 22) + 'px';
+      resetButton.style.top = (resetScreenY - 22) + 'px';
       
       // Unsichtbarer Spacer für Text-Umfluss um animierte 3D-Hand
       const instrText = document.getElementById('instructionText');
