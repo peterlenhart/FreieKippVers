@@ -118,10 +118,25 @@
       text-shadow: 0 1px 2px rgba(0,0,0,0.8);
       pointer-events: none;
       line-height: 1.4;
-      display: block;
+      display: none;
     }
     
     #tutorialText {
+      position: absolute;
+      top: 421px;
+      left: 66px;
+      width: 284px;
+      text-align: left;
+      font-size: 11pt;
+      font-family: Arial, sans-serif;
+      color: #d4b48c;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      pointer-events: none;
+      line-height: 1.4;
+      display: none;
+    }
+    
+    #spielZielText {
       position: absolute;
       top: 421px;
       left: 66px;
@@ -350,6 +365,7 @@
     <div id="instructionText">Kippe den Würfel in der Box in beliebige Richtung von Ecke zu Ecke. Merke dir möglichst viele Zahlenpositionen.<br>Wenn du bereit bist, dann decke hier links dein erstes von sechs KIPP-Zielen auf.</div>
     <img id="verdecktesKippziel" src="leernohit.webp" style="display:none;">
     <div id="tutorialText"></div>
+    <div id="spielZielText"></div>
     <div id="brainScore"></div>
     <div id="countdown">60</div>
     <button id="actionButton">weiter</button>
@@ -1493,7 +1509,7 @@
       onRunde();
     }
 
-    let gamePhase = 'demo'; // Startet mit Demo-Phase
+    let gamePhase = 'spielziel'; // Startet mit Spielziel-Phase
     let currentMode = 'kanten';
     let kippCount = 0;
     let countdownTimer = null;
@@ -1691,6 +1707,80 @@
         startDemoAnimation(); // Texte erscheinen automatisch bei Wobbles
       }
     }, 600);
+    
+    // === PHASE 1: SPIEL ZIEL ===
+    // Farbnamen für Tutorial-Anzeige
+    const FARB_DISPLAY = {
+      'violett': 'Violett', 'blau': 'Blau', 'gruen': 'Grün', 'orange': 'Orange'
+    };
+    
+    // Beispiel-Kippziel aus aktueller Würfellage (Q3, f2 oben) generieren
+    function initSpielzielPhase() {
+      // Zufälligen Slot wählen (S1-S4)
+      const slotIdx = Math.floor(Math.random() * 4);
+      const slotNames = ['S1', 'S2', 'S3', 'S4'];
+      const beispielZahl = deck[8 + slotIdx]; // f2 offset = 8
+      const beispielFarbe = SLOT_NEIGHBOR_COLORS[3][slotNames[slotIdx]]; // Q3
+      const farbDisplay = FARB_DISPLAY[beispielFarbe] || beispielFarbe;
+      
+      // Beispiel-Kippziel auf verdecktesMesh zeichnen
+      function drawBeispiel() {
+        if (!texturesReady || !colorTargetImages[beispielFarbe]) {
+          setTimeout(drawBeispiel, 50);
+          return;
+        }
+        const img = colorTargetImages[beispielFarbe];
+        verdecktesCtx.clearRect(0, 0, 85, 170);
+        verdecktesCtx.drawImage(img, 0, 0, 85, 170);
+        const displayText = beispielZahl + ((beispielZahl === 6 || beispielZahl === 9) ? '.' : '');
+        verdecktesCtx.fillStyle = '#2a1810';
+        verdecktesCtx.font = 'bold 56px Arial';
+        verdecktesCtx.textAlign = 'center';
+        verdecktesCtx.textBaseline = 'middle';
+        verdecktesCtx.fillText(displayText, 42, 42);
+        verdecktesCanvasTex.needsUpdate = true;
+      }
+      drawBeispiel();
+      
+      // Mesh sichtbar, kein Puls
+      verdecktesMesh.visible = true;
+      verdecktesMesh.userData.revealed = true;
+      verdecktesMesh.scale.set(1, 1, 1);
+      verdecktesMat.opacity = 1;
+      
+      // Texte
+      document.getElementById('instructionText').style.display = 'none';
+      document.getElementById('tutorialText').style.display = 'none';
+      const szText = document.getElementById('spielZielText');
+      szText.innerHTML = '<b>SPIEL ZIEL</b><br>' +
+        'Erkippe möglichst viele der 6 Kippziele (z.B. ' + beispielZahl + ' an ' + farbDisplay + ') mit möglichst wenig Schau-Sekunden.' +
+        '<div style="margin-top:0.5em"><b>BRAIN SCORE:</b></div>' +
+        '100 = 6 Hits / ≤30 Schau-Sek.<br>' +
+        '12 = 1 Hit / 120 Schau-Sek.<br>' +
+        '0 Hits = kein Score.';
+      szText.style.display = 'block';
+    }
+    initSpielzielPhase();
+    
+    // Spielziel → Demo Übergang
+    function spielzielToDemoPhase() {
+      gamePhase = 'demo';
+      document.getElementById('spielZielText').style.display = 'none';
+      document.getElementById('instructionText').style.display = 'block';
+      
+      // verdecktesMesh zurück auf leernohit + Puls
+      verdecktesMesh.userData.revealed = false;
+      drawLeernohitOnVerdecktes();
+      
+      // Würfel resetten für Demo
+      cube.quaternion.set(0, 0, 0, 1);
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      currentQuadrant = 3;
+      topFace = 'f2';
+      
+      // Demo starten
+      startDemoAnimation();
+    }
     
     function phaseKippenToSpielen() {
       gamePhase = 'spielen';
@@ -2020,6 +2110,13 @@
 
 
     renderer.domElement.addEventListener('touchstart', (e) => {
+      // Spielziel-Phase beenden beim ersten Touch
+      if (gamePhase === 'spielziel') {
+        e.preventDefault();
+        spielzielToDemoPhase();
+        return;
+      }
+      
       // Demo-Phase beenden beim ersten Touch
       if (gamePhase === 'demo') {
         e.preventDefault(); // Touch während Demo verarbeiten
@@ -2286,6 +2383,10 @@
 
     // Desktop-Support: Click startet Spielphase
     renderer.domElement.addEventListener('click', (e) => {
+      if (gamePhase === 'spielziel') {
+        spielzielToDemoPhase();
+        return;
+      }
       if (gamePhase === 'demo') {
         gamePhase = 'kippen';
         handDemo.visible = false;
@@ -2475,10 +2576,6 @@
     let lockedKippDir = null; // null, 'cw', 'ccw'
     let currentDragDir = null;
     
-    // Farbnamen für Tutorial-Anzeige
-    const FARB_DISPLAY = {
-      'violett': 'Violett', 'blau': 'Blau', 'gruen': 'Grün', 'orange': 'Orange'
-    };
     const cwBtn = document.getElementById('cwBtn');
     const ccwBtn = document.getElementById('ccwBtn');
 
