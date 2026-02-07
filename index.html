@@ -1553,6 +1553,8 @@
     let gamePhase = 'spielziel';
     let currentMode = 'kanten';
     let kippCount = 0;
+    let liegeZeiten = [];
+    let liegeStartTime = null;
     let countdownTimer = null;
 
     // UI für Demo-Phase initialisieren
@@ -1920,6 +1922,10 @@
       
       // kippCount zurücksetzen für 6-Kipp-Regel
       kippCount = 0;
+      
+      // Liegezeit-Tracking
+      liegeZeiten = [];
+      liegeStartTime = performance.now(); // Ab Start liegt der Würfel
 
       // Kärtchen werden in fillAllCards() sichtbar gemacht - NICHT hier
 
@@ -2089,6 +2095,22 @@
     function checkKippzielTap() {
       if (!erstesKippziel || kippzielChecked) return;
       kippzielChecked = true;
+      
+      // Letzte Liegezeit erfassen
+      if (liegeStartTime) {
+        liegeZeiten.push(Math.round(performance.now() - liegeStartTime));
+        liegeStartTime = null;
+      }
+      
+      // Alle Liegezeiten loggen
+      console.log('=== LIEGEZEITEN bei Kippziel-Klick (nach ' + kippCount + ' Kipps) ===');
+      liegeZeiten.forEach((ms, i) => {
+        console.log('Liegezeit ' + (i+1) + ': ' + ms + ' ms');
+      });
+      if (liegeZeiten.length) {
+        const avg = Math.round(liegeZeiten.reduce((a,b) => a+b, 0) / liegeZeiten.length);
+        console.log('Durchschnitt: ' + avg + ' ms, Min: ' + Math.min(...liegeZeiten) + ' ms, Max: ' + Math.max(...liegeZeiten) + ' ms');
+      }
       
       // Timer stoppen
       stopCountdown();
@@ -2512,6 +2534,13 @@
           if (lockedKippDir === 'ccw' && CW_DIRS.has(direction)) { isSwiping = false; return; }
         }
         currentDragDir = direction;
+        
+        // Liegezeit erfassen (spielen-Phase)
+        if (gamePhase === 'spielen' && liegeStartTime) {
+          const liegeMs = Math.round(performance.now() - liegeStartTime);
+          liegeZeiten.push(liegeMs);
+          liegeStartTime = null;
+        }
 
         const config = getKippConfig(direction);
         dragAxis = config.axis;
@@ -2666,10 +2695,25 @@
                   lockedKippDir = isCW ? 'cw' : 'ccw';
                 }
                 kippCount++;
+                
+                // Liegezeit-Start: Würfel liegt jetzt
+                liegeStartTime = performance.now();
+                
                 // 6-Kipp-Regel: mehr als 6 Kipps = automatisch nicht getroffen
                 if (kippCount > 6 && !kippzielChecked) {
                   kippzielChecked = true;
                   drawKippzielBorder(false);
+                }
+                
+                // Nach 6 Kipps: Liegezeiten loggen
+                if (kippCount === 6) {
+                  console.log('=== LIEGEZEITEN nach 6 Kipps ===');
+                  liegeZeiten.forEach((ms, i) => {
+                    console.log('Liegezeit vor Kipp ' + (i+2) + ': ' + ms + ' ms');
+                  });
+                  const avg = liegeZeiten.length ? Math.round(liegeZeiten.reduce((a,b) => a+b, 0) / liegeZeiten.length) : 0;
+                  console.log('Durchschnitt: ' + avg + ' ms');
+                  console.log('Min: ' + Math.min(...liegeZeiten) + ' ms, Max: ' + Math.max(...liegeZeiten) + ' ms');
                 }
               }
             }
