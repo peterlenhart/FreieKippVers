@@ -608,7 +608,7 @@
     const cardZ = 0.109375 + 4 * 0.15625 + 0.15625 + 15 * (2.5 / 720); // 4 Zeilen südlich, + 15px
 
     const totalCardsWidth = 6 * cardWidth + 5 * cardGap; // Tatsächliche Breite aller Kärtchen + Gaps
-    const cardStartX = totalCardsWidth / 2 - cardWidth / 2; // Rechteste 3D-Position = links auf Screen
+    const cardStartX = -totalCardsWidth / 2 + cardWidth / 2;
 
     const gameCards = [];
     
@@ -683,7 +683,7 @@
       });
       const plane = new THREE.Mesh(geo, mat);
       plane.rotation.x = -Math.PI / 2;
-      plane.position.set(cardStartX - i * (cardWidth + cardGap), cardY, cardZ);
+      plane.position.set(cardStartX + i * (cardWidth + cardGap), cardY, cardZ);
       plane.castShadow = true;
       plane.receiveShadow = true;
       scene.add(plane);
@@ -2085,7 +2085,8 @@
       currentQuadrant = 3;
       topFace = 'f2';
       
-      // Verdecktes Kärtchen pulsierend
+      // Verdecktes Kärtchen pulsierend - IMMER auf linkeste Position (Index 0) zurücksetzen
+      verdecktesMesh.position.set(cardStartX, cardY + 0.001, cardZ);
       verdecktesMesh.userData.revealed = false;
       drawLeernohitOnVerdecktes();
       verdecktesMesh.visible = true;
@@ -2668,7 +2669,7 @@
       currentDragDir = null;
       
       // verdecktesMesh an nächste Kärtchen-Position verschieben
-      const nextX = cardStartX - activeCardIdx * (cardWidth + cardGap);
+      const nextX = cardStartX + activeCardIdx * (cardWidth + cardGap);
       verdecktesMesh.position.set(nextX, cardY + 0.001, cardZ);
       verdecktesMesh.userData.revealed = false;
       drawLeernohitOnVerdecktes();
@@ -2789,6 +2790,9 @@
       totalObservationTime = 0;
       tapCount = 0;
       tapIndicatorA.mesh.visible = false; tapIndicatorB.mesh.visible = false;
+      activeCardIdx = 0;
+      bereitsGetroffen.clear();
+      bereitsAusgegeben.clear();
       offeneKippzieleVergeben = 0;
       openKippzielPositions = pickTwoRandomPositions();
       
