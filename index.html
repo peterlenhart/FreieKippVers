@@ -1270,6 +1270,25 @@
       { name: 'orange',  hex: '#e67814' }
     ];
 
+    // === Offene Kippziele: genau 2 von 6 haben eine Zahl, die in der aktuellen Ausgangslage sichtbar ist ===
+    function pickTwoRandomPositions() {
+      const all = [0, 1, 2, 3, 4, 5];
+      for (let i = all.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j], all[i]];
+      }
+      return new Set([all[0], all[1]]);
+    }
+    let openKippzielPositions = pickTwoRandomPositions();
+    let offeneKippzieleVergeben = 0; // Zählt wie viele offene bereits generiert wurden
+
+    // Aktuell sichtbare Zahlen auf der Oberseite ermitteln (aus aktuellem topFace)
+    function getCurrentVisibleZahlen() {
+      const faceOffset = { f0: 0, f1: 4, f2: 8 };
+      const off = faceOffset[topFace];
+      return new Set([deck[off], deck[off+1], deck[off+2], deck[off+3]]);
+    }
+
     function fillCardWithKombi(idx, zahl, colorObj) {
       const card = gameCards[idx];
       
@@ -1319,23 +1338,24 @@
     }
     
 
-    function generateNeueKombiOhne(ausschlussSet) {
-      // Alle möglichen Kombis
+    function generateNeueKombiOhne(ausschlussSet, zahlenFilter, visibleZahlen) {
+      // zahlenFilter: 'open' = nur sichtbare Zahlen, 'closed' = nur NICHT sichtbare, undefined = alle
+      // visibleZahlen: Set der aktuell sichtbaren Zahlen (nur nötig wenn zahlenFilter gesetzt)
       const alleMoeglichenKombis = [];
       for (let z = 1; z <= 12; z++) {
+        if (zahlenFilter === 'open' && visibleZahlen && !visibleZahlen.has(z)) continue;
+        if (zahlenFilter === 'closed' && visibleZahlen && visibleZahlen.has(z)) continue;
+        
         for (const colorObj of GAME_COLORS) {
           const key = z + '_' + colorObj.name;
-          // Nur Kombis die noch nicht ausgegeben wurden UND nicht im Ausschluss-Set
           if (!bereitsAusgegeben.has(key) && !ausschlussSet.has(key)) {
             alleMoeglichenKombis.push({ zahl: z, color: colorObj });
           }
         }
       }
       
-      // Wenn keine mehr verfügbar, null zurückgeben
       if (alleMoeglichenKombis.length === 0) return null;
       
-      // Zufällige auswählen
       const idx = Math.floor(Math.random() * alleMoeglichenKombis.length);
       return alleMoeglichenKombis[idx];
     }
@@ -1367,8 +1387,17 @@
       // ERST: NEUES KÄRTCHEN GENERIEREN
       if (activeCardIdx < 6) {
         const erfuellteKombis = getCurrentErfuellteKombis();
-        const neueKombi = generateNeueKombiOhne(erfuellteKombis);
+        const visibleZahlen = getCurrentVisibleZahlen();
+        let zahlenFilter;
+        if (openKippzielPositions.has(activeCardIdx) && offeneKippzieleVergeben < 2) {
+          zahlenFilter = 'open';
+        } else {
+          zahlenFilter = 'closed';
+        }
+        let neueKombi = generateNeueKombiOhne(erfuellteKombis, zahlenFilter, visibleZahlen);
+        if (!neueKombi) neueKombi = generateNeueKombiOhne(erfuellteKombis); // Fallback
         if (neueKombi) {
+          if (visibleZahlen.has(neueKombi.zahl)) offeneKippzieleVergeben++;
           fillCardWithKombi(activeCardIdx, neueKombi.zahl, neueKombi.color);
         }
       }
@@ -1394,9 +1423,9 @@
     
     function calculateBrainScore(observationTime, hits) {
       // Constants
-      const FREE_TIME = 30;
+      const FREE_TIME = 20;
       const MAX_TIME = 120;
-      const EXTRA_TIME_RANGE = 90; // MAX_TIME - FREE_TIME
+      const EXTRA_TIME_RANGE = 100; // MAX_TIME - FREE_TIME
       const k = 1.0;
       const c = 2.5976583;
       
@@ -2194,6 +2223,8 @@
       activeCardIdx = 0;
       bereitsGetroffen.clear();
       bereitsAusgegeben.clear();
+      offeneKippzieleVergeben = 0;
+      openKippzielPositions = pickTwoRandomPositions();
       
       // Alle Card-Flags zurücksetzen
       gameCards.forEach(c => {
@@ -2216,8 +2247,12 @@
         } else {
           // Fallback falls kein Kippziel vorgemerkt
           const erfuellteKombis = getCurrentErfuellteKombis();
-          const neueKombi = generateNeueKombiOhne(erfuellteKombis);
+          const visibleZahlen = getCurrentVisibleZahlen();
+          const zahlenFilter = openKippzielPositions.has(0) && offeneKippzieleVergeben < 2 ? 'open' : 'closed';
+          let neueKombi = generateNeueKombiOhne(erfuellteKombis, zahlenFilter, visibleZahlen);
+          if (!neueKombi) neueKombi = generateNeueKombiOhne(erfuellteKombis);
           if (neueKombi) {
+            if (visibleZahlen.has(neueKombi.zahl)) offeneKippzieleVergeben++;
             fillCardWithKombi(0, neueKombi.zahl, neueKombi.color);
           }
         }
@@ -2310,10 +2345,29 @@
       isDemoAnimating = false;
       handDemo.visible = false;
       
-      // Kippziel generieren
+      // Kippziel generieren mit open/closed Filter
       const erfuellteKombis = getCurrentErfuellteKombis();
-      erstesKippziel = generateNeueKombiOhne(erfuellteKombis);
+      const visibleZahlen = getCurrentVisibleZahlen();
+      
+      let zahlenFilter = undefined;
+      if (openKippzielPositions.has(activeCardIdx) && offeneKippzieleVergeben < 2) {
+        zahlenFilter = 'open';
+      } else {
+        zahlenFilter = 'closed';
+      }
+      
+      erstesKippziel = generateNeueKombiOhne(erfuellteKombis, zahlenFilter, visibleZahlen);
+      
+      // Fallback: wenn Filter nichts liefert, ohne Filter versuchen
+      if (!erstesKippziel) {
+        erstesKippziel = generateNeueKombiOhne(erfuellteKombis);
+      }
       if (!erstesKippziel) return;
+      
+      // Tracking: war es eine sichtbare Zahl?
+      if (visibleZahlen.has(erstesKippziel.zahl)) {
+        offeneKippzieleVergeben++;
+      }
       
       // Farb-Image + Zahl auf verdecktes Canvas zeichnen
       const img = colorTargetImages[erstesKippziel.color.name];
@@ -2704,6 +2758,8 @@
       totalObservationTime = 0;
       tapCount = 0;
       tapIndicatorA.mesh.visible = false; tapIndicatorB.mesh.visible = false;
+      offeneKippzieleVergeben = 0;
+      openKippzielPositions = pickTwoRandomPositions();
       
       gamePhase = 'spielziel';
       initSpielzielPhase();
