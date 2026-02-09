@@ -718,15 +718,15 @@
     
     // Warten bis alle Bilder geladen sind
     let texturesReady = false;
+    
     Promise.all(imageLoadPromises).then(() => {
       texturesReady = true;
-      console.log('All 4 color textures ready');
-      // WICHTIG: Button erst jetzt aktivieren
+      console.log('All textures ready');
       actionButton.disabled = false;
     }).catch(() => {
       console.error('Some textures failed to load');
       texturesReady = true;
-      actionButton.disabled = false; // Trotzdem weitermachen
+      actionButton.disabled = false;
     });
     
     for (let i = 0; i < 6; i++) {
@@ -2140,14 +2140,16 @@
     let timerTopPos = null;
     // === START-OVERLAY: Warten auf Spieler-Wahl ===
     document.getElementById('btnTutorial').addEventListener('click', () => {
+      if (!texturesReady) return;
       document.getElementById('startOverlay').style.display = 'none';
       isReplay = false;
       initSpielzielPhase();
     });
     document.getElementById('btnSpielen').addEventListener('click', () => {
+      if (!texturesReady) return;
       document.getElementById('startOverlay').style.display = 'none';
       isReplay = true;
-      initSpielzielPhase(); // springt intern direkt zu initEntscheidungPhase()
+      initSpielzielPhase();
     });
     
     document.getElementById('startBackBtn').addEventListener('click', () => {
