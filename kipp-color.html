@@ -494,6 +494,7 @@
   
   <!-- START-OVERLAY -->
   <div id="startOverlay">
+    <div id="startBackBtn" style="position:absolute; top:0; left:0; width:90px; height:90px; cursor:pointer; pointer-events:auto; z-index:310;"></div>
     <button class="startClickZone" id="btnTutorial">SPIEL MIT ANLEITUNG</button>
     <button class="startClickZone" id="btnSpielen">SPIELEN</button>
   </div>
@@ -2131,6 +2132,10 @@
       document.getElementById('startOverlay').style.display = 'none';
       isReplay = true;
       initSpielzielPhase(); // springt intern direkt zu initEntscheidungPhase()
+    });
+    
+    document.getElementById('startBackBtn').addEventListener('click', () => {
+      window.location.href = 'index.html';
     });
     
     // Zurück zur Startseite (resetButton in Start/Spielziel-Phase)
