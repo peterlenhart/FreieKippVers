@@ -188,6 +188,73 @@
       width:1136px;
     }
 
+    /* Language Icon & Dropdown */
+    #langIcon {
+      position: absolute;
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 15;
+    }
+    #langIcon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #langDropdown {
+      display: none;
+      position: absolute;
+      z-index: 9000;
+      pointer-events: auto;
+      background-image: url("sprachdrop.png");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      box-shadow: 10px 14px 30px rgba(0,0,0,0.75), 3px 5px 10px rgba(0,0,0,0.5);
+      border-radius: 12px;
+    }
+    #langDropdown.show { display: block; }
+
+    .langRow {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10%;
+      box-sizing: border-box;
+    }
+
+    /* Toggle Switch */
+    .langToggle {
+      width: 44px; height: 24px;
+      border-radius: 12px;
+      background: #1a0e06;
+      border: 1.5px solid #5a3a20;
+      position: relative;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .langToggle.active {
+      background: linear-gradient(90deg, #8b6914, #d4a843);
+      border-color: #d4a843;
+    }
+    .langToggle::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #888, #555);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .langToggle.active::after {
+      transform: translateX(20px);
+      background: linear-gradient(180deg, #f0d080, #c89b30);
+    }
+
   </style>
 </head>
 
@@ -215,6 +282,21 @@
         <div id="closeBtn" class="iconClickArea"></div>
         <div id="legalBtn" class="iconClickArea"></div>
         <div id="shareBtn" class="iconClickArea"></div>
+
+        <!-- Language Icon at 2F -->
+        <div id="langIcon">
+          <img src="sprachicon.png" alt="Language">
+        </div>
+
+        <!-- Language Dropdown (sprachdrop.png as background) -->
+        <div id="langDropdown">
+          <div class="langRow" data-lang="de" style="top:41.2%; height:8.7%"><div class="langToggle"></div></div>
+          <div class="langRow" data-lang="en" style="top:49.9%; height:7.6%"><div class="langToggle"></div></div>
+          <div class="langRow" data-lang="it" style="top:57.5%; height:6.8%"><div class="langToggle"></div></div>
+          <div class="langRow" data-lang="fr" style="top:64.4%; height:7.1%"><div class="langToggle"></div></div>
+          <div class="langRow" data-lang="es" style="top:71.5%; height:7.1%"><div class="langToggle"></div></div>
+          <div class="langRow" data-lang="tr" style="top:78.6%; height:7.4%"><div class="langToggle"></div></div>
+        </div>
 
       </div>
     </div>
@@ -335,6 +417,24 @@
       const shareBtn = document.getElementById("shareBtn");
       shareBtn.style.left = (cellPx * 6.5) + "px";
       shareBtn.style.top = iconRow + "px";
+
+      // Language Icon: Zelle 2F (Spalte F = index 5, row 0_2)
+      const langIcon = document.getElementById("langIcon");
+      langIcon.style.left = (cellPx * 5) + "px";
+      langIcon.style.top = iconRow + "px";
+      langIcon.style.width = cellPx + "px";
+      langIcon.style.height = cellPx + "px";
+
+      // Language Dropdown: 4 Zellen breit, Höhe proportional (Bild 677×1024)
+      const langDD = document.getElementById("langDropdown");
+      const ddWidth = cellPx * 4;
+      const ddHeight = ddWidth * (1024 / 677);
+      const ddRight = cellPx * 6;
+      const ddLeft = ddRight - ddWidth;
+      langDD.style.width = ddWidth + "px";
+      langDD.style.height = ddHeight + "px";
+      langDD.style.left = Math.max(0, ddLeft) + "px";
+      langDD.style.top = (iconRow + cellPx + 8) + "px";
     }
 
     function rebuild(){
@@ -402,6 +502,50 @@
     document.getElementById("legalBtn").onclick = () => {
       window.open("legal.html", "_blank");
     };
+
+    // === LANGUAGE SELECTION ===
+    const langDropdown = document.getElementById("langDropdown");
+    const langIcon = document.getElementById("langIcon");
+    const langRows = document.querySelectorAll(".langRow");
+
+    // Aktive Sprache aus localStorage oder default DE
+    let currentLang = localStorage.getItem("digikipp_lang") || "de";
+
+    function updateToggles() {
+      langRows.forEach(row => {
+        const toggle = row.querySelector(".langToggle");
+        if (row.dataset.lang === currentLang) {
+          toggle.classList.add("active");
+        } else {
+          toggle.classList.remove("active");
+        }
+      });
+    }
+    updateToggles();
+
+    // Icon klick → Dropdown auf/zu
+    langIcon.onclick = (e) => {
+      e.stopPropagation();
+      langDropdown.classList.toggle("show");
+    };
+
+    // Sprache wählen → setzen, schließen
+    langRows.forEach(row => {
+      row.onclick = (e) => {
+        e.stopPropagation();
+        currentLang = row.dataset.lang;
+        localStorage.setItem("digikipp_lang", currentLang);
+        updateToggles();
+        // Auto-close nach kurzer Verzögerung
+        setTimeout(() => langDropdown.classList.remove("show"), 200);
+      };
+    });
+
+    // Klick außerhalb → Dropdown schließen
+    document.addEventListener("click", () => {
+      langDropdown.classList.remove("show");
+    });
+    langDropdown.onclick = (e) => e.stopPropagation();
 
   </script>
 </body>
