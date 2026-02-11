@@ -495,8 +495,8 @@
   <!-- START-OVERLAY -->
   <div id="startOverlay">
     <div id="startBackBtn" style="position:absolute; top:0; left:0; width:90px; height:90px; cursor:pointer; pointer-events:auto; z-index:310;"></div>
-    <button class="startClickZone" id="btnTutorial">SPIEL MIT ANLEITUNG</button>
-    <button class="startClickZone" id="btnSpielen">SPIELEN</button>
+    <button class="startClickZone" id="btnTutorial" disabled style="opacity:0.4">SPIEL MIT ANLEITUNG</button>
+    <button class="startClickZone" id="btnSpielen" disabled style="opacity:0.4">SPIELEN</button>
   </div>
   
   <div id="uiOverlay">
@@ -544,6 +544,7 @@
         k1:"SCHAUEN & MERKEN", k2:"Kippe den W\u00fcrfel in der Box in beliebige Richtung von Ecke zu Ecke. Merke dir m\u00f6glichst viele Zahlenpositionen in m\u00f6glichst kurzer Zeit (Nutze SCHAU-Sek. effektiv).<br>Nach dem SCHAUEN deckst du hier links dein erstes von sechs Kippzielen auf.",
         p1:"TIPPEN & SCHUBSEN", p2:"Das Kippziel links zeigt: <b>{zahl}</b> muss zu <b>{farbe}</b> gekippt werden.<br><b>TIPPE</b> ein- bis sechsmal auf den W\u00fcrfel.<br><b>SCHUBSE</b> ihn anschlie\u00dfend in die gew\u00fcnschte Richtung, um den Kippzug auszul\u00f6sen.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} SCHAU-Sekunden", bw:"Best: 100% | Worst: 12%",
+        ma:"SPIEL MIT ANLEITUNG", sp:"SPIELEN",
         fV:"Violett", fB:"Blau", fG:"Gr\u00fcn", fO:"Orange"
       },
       "en": {
@@ -553,6 +554,7 @@
         k1:"LOOK & REMEMBER", k2:"Tip the cube inside the box in any direction from corner to corner. Memorize as many number positions as possible in the shortest time (Use LOOK seconds efficiently).<br>After LOOKING, uncover your first of six targets here on the left.",
         p1:"TAP & PUSH", p2:"The target on the left shows: <b>{zahl}</b> must reach <b>{farbe}</b>.<br><b>TAP</b> the cube one to six times.<br><b>PUSH</b> it in the desired direction to trigger the tipping move.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} LOOK seconds", bw:"Best: 100% | Worst: 12%",
+        ma:"PLAY WITH TUTORIAL", sp:"PLAY",
         fV:"Violet", fB:"Blue", fG:"Green", fO:"Orange"
       },
       "es": {
@@ -562,6 +564,7 @@
         k1:"MIRAR & RECORDAR", k2:"Volca el cubo dentro de la caja en cualquier direcci\u00f3n de esquina a esquina. Memoriza tantas posiciones de n\u00fameros como sea posible en el menor tiempo (Usa los segundos de MIRAR eficientemente).<br>Despu\u00e9s de MIRAR, descubre aqu\u00ed a la izquierda tu primer objetivo de seis.",
         p1:"TOCAR & EMPUJAR", p2:"El objetivo a la izquierda muestra: <b>{zahl}</b> debe llegar a <b>{farbe}</b>.<br><b>TOCA</b> el cubo de una a seis veces.<br><b>EMPUJA</b> en la direcci\u00f3n deseada para activar el volcado.",
         bs:"BRAIN SCORE", nh:"Sin acierto, sin puntos", st:"{t} ACIERTOS | {z} seg. de MIRAR", bw:"Mejor: 100% | Peor: 12%",
+        ma:"JUGAR CON GU\u00cdA", sp:"JUGAR",
         fV:"Violeta", fB:"Azul", fG:"Verde", fO:"Naranja"
       },
       "fr": {
@@ -571,6 +574,7 @@
         k1:"REGARDER & RETENIR", k2:"Bascule le cube dans la bo\u00eete dans n\u2019importe quelle direction de coin en coin. M\u00e9morise autant de positions de chiffres que possible en un minimum de temps (Utilise les secondes de REGARD efficacement).<br>Apr\u00e8s avoir REGARD\u00c9, d\u00e9couvre ici \u00e0 gauche ta premi\u00e8re cible sur six.",
         p1:"TAPER & POUSSER", p2:"La cible \u00e0 gauche indique : <b>{zahl}</b> doit atteindre <b>{farbe}</b>.<br><b>TAPE</b> une \u00e0 six fois sur le cube.<br><b>POUSSE</b>-le dans la direction souhait\u00e9e pour d\u00e9clencher le basculement.",
         bs:"BRAIN SCORE", nh:"Aucun coup, aucun score", st:"{t} COUPS | {z} sec. de REGARD", bw:"Meilleur: 100% | Pire: 12%",
+        ma:"JOUER AVEC GUIDE", sp:"JOUER",
         fV:"Violet", fB:"Bleu", fG:"Vert", fO:"Orange"
       },
       "it": {
@@ -580,6 +584,7 @@
         k1:"GUARDA & RICORDA", k2:"Ribalta il cubo nella scatola in qualsiasi direzione da angolo ad angolo. Memorizza quante pi\u00f9 posizioni di numeri possibile nel minor tempo (Usa i secondi di GUARDA in modo efficiente).<br>Dopo aver GUARDATO, scopri qui a sinistra il tuo primo bersaglio su sei.",
         p1:"TOCCA & SPINGI", p2:"Il bersaglio a sinistra mostra: <b>{zahl}</b> deve raggiungere <b>{farbe}</b>.<br><b>TOCCA</b> il cubo da una a sei volte.<br><b>SPINGI</b> nella direzione desiderata per attivare il ribaltamento.",
         bs:"BRAIN SCORE", nh:"Nessun colpo, nessun punteggio", st:"{t} COLPI | {z} sec. di GUARDA", bw:"Migliore: 100% | Peggiore: 12%",
+        ma:"GIOCA CON GUIDA", sp:"GIOCARE",
         fV:"Viola", fB:"Blu", fG:"Verde", fO:"Arancione"
       },
       "tr": {
@@ -589,10 +594,13 @@
         k1:"BAK & HATIRLA", k2:"K\u00fcp\u00fc kutunun i\u00e7inde herhangi bir y\u00f6ne k\u00f6\u015feden k\u00f6\u015feye devir. M\u00fcmk\u00fcn oldu\u011funca \u00e7ok say\u0131 pozisyonunu en k\u0131sa s\u00fcrede ezberle (BAKMA saniyelerini verimli kullan).<br>BAKTIKTAN sonra burada solda alt\u0131 hedefinden ilkini a\u00e7.",
         p1:"DOKUN & \u0130T", p2:"Soldaki hedef g\u00f6steriyor: <b>{zahl}</b> \u2192 <b>{farbe}</b> olmal\u0131.<br>K\u00fcpe <b>bir ile alt\u0131</b> kez <b>DOKUN</b>.<br>Sonra istedi\u011fin y\u00f6ne <b>\u0130T</b> ve devrilmeyi ba\u015flat.",
         bs:"BRAIN SCORE", nh:"\u0130sabet yok, puan yok", st:"{t} \u0130SABET | {z} BAKMA saniyesi", bw:"En iyi: 100% | En k\u00f6t\u00fc: 12%",
+        ma:"REHBERL\u0130 OYNA", sp:"OYNA",
         fV:"Mor", fB:"Mavi", fG:"Ye\u015fil", fO:"Turuncu"
       }
     }[_digikippLang];
-    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
+    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
+    document.getElementById("btnTutorial").textContent = T.ma;
+    document.getElementById("btnSpielen").textContent = T.sp;
 
     // =========================
     // Scene Setup
@@ -784,10 +792,18 @@
       texturesReady = true;
       console.log('All textures ready');
       actionButton.disabled = false;
+      document.getElementById('btnTutorial').disabled = false;
+      document.getElementById('btnTutorial').style.opacity = '1';
+      document.getElementById('btnSpielen').disabled = false;
+      document.getElementById('btnSpielen').style.opacity = '1';
     }).catch(() => {
       console.error('Some textures failed to load');
       texturesReady = true;
       actionButton.disabled = false;
+      document.getElementById('btnTutorial').disabled = false;
+      document.getElementById('btnTutorial').style.opacity = '1';
+      document.getElementById('btnSpielen').disabled = false;
+      document.getElementById('btnSpielen').style.opacity = '1';
     });
     
     for (let i = 0; i < 6; i++) {
@@ -2131,6 +2147,9 @@
       
       gamePhase = 'spielziel';
       
+      // Position immer auf erstes Kärtchen zurücksetzen (wichtig nach "Neues Spiel")
+      verdecktesMesh.position.set(cardStartX, cardY + 0.001, cardZ);
+      
       // Zufälligen Slot wählen (S1-S4)
       const slotIdx = Math.floor(Math.random() * 4);
       const slotNames = ['S1', 'S2', 'S3', 'S4'];
@@ -2231,6 +2250,8 @@
       verdecktesMesh.visible = false;
       // Start-Buttons wieder zeigen
       document.getElementById('startOverlay').style.display = 'block';
+      document.getElementById('btnTutorial').textContent = T.ma;
+      document.getElementById('btnSpielen').textContent = T.sp;
       gamePhase = 'start';
     }
     
