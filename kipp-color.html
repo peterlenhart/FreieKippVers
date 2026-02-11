@@ -881,11 +881,18 @@
     const verdecktesCanvasTex = new THREE.CanvasTexture(verdecktesCanvas);
     
     // leernohit.webp initial draufzeichnen sobald geladen
+    function refreshVerdecktesTex() {
+      if (verdecktesMat._currentTex) verdecktesMat._currentTex.dispose();
+      const tex = new THREE.CanvasTexture(verdecktesCanvas);
+      verdecktesMat._currentTex = tex;
+      verdecktesMat.map = tex;
+      verdecktesMat.needsUpdate = true;
+    }
     function drawLeernohitOnVerdecktes() {
       if (leerImage) {
         verdecktesCtx.clearRect(0, 0, 85, 170);
         verdecktesCtx.drawImage(leerImage, 0, 0, 85, 170);
-        verdecktesCanvasTex.needsUpdate = true;
+        refreshVerdecktesTex();
       } else {
         setTimeout(drawLeernohitOnVerdecktes, 50);
       }
@@ -2351,7 +2358,7 @@
         verdecktesCtx.textAlign = 'center';
         verdecktesCtx.textBaseline = 'middle';
         verdecktesCtx.fillText(displayText, 42, 42);
-        verdecktesCanvasTex.needsUpdate = true;
+        refreshVerdecktesTex();
       }
       drawBeispiel();
       
@@ -2485,14 +2492,9 @@
       verdecktesCtx.textAlign = 'center';
       verdecktesCtx.textBaseline = 'middle';
       verdecktesCtx.fillText(displayText, 42, 42);
-      // Create fresh texture from canvas to guarantee update
-      const freshTex = new THREE.CanvasTexture(verdecktesCanvas);
-      freshTex.needsUpdate = true;
-      verdecktesMat.map = freshTex;
+      refreshVerdecktesTex();
       verdecktesMat.transparent = true;
       verdecktesMat.opacity = 1;
-      verdecktesMat.needsUpdate = true;
-      verdecktesMesh.material = verdecktesMat;
       verdecktesMesh.visible = true;
       verdecktesMesh.scale.set(1, 1, 1);
       verdecktesMesh.userData.revealed = true;
@@ -2665,11 +2667,8 @@
         verdecktesCtx.lineWidth = 4;
         verdecktesCtx.strokeRect(4, 4, 77, 162);
       }
-      // Refresh texture on material (freshTex may have replaced verdecktesCanvasTex)
-      const resultTex = new THREE.CanvasTexture(verdecktesCanvas);
-      resultTex.needsUpdate = true;
-      verdecktesMat.map = resultTex;
-      verdecktesMat.needsUpdate = true;
+      // Update texture on material
+      refreshVerdecktesTex();
       // Show subtitle
       showSubtitle(isHit ? T.d4h : T.d4m, 2000);
     }
@@ -2921,9 +2920,6 @@
       verdecktesMat.needsUpdate = true;
       verdecktesMesh.material = verdecktesMat;
       drawLeernohitOnVerdecktes();
-      // Reassign canvas texture to material (previous rounds swap in fresh textures)
-      verdecktesMat.map = verdecktesCanvasTex;
-      verdecktesMat.needsUpdate = true;
 
       // Subtitle: "Klick dir dein KIPP ZIEL."
       await showSubtitle(T.d2, 2500);
@@ -2943,9 +2939,6 @@
       console.log('Revealing Kippziel:', kz.zahl, kz.color.name, 'img loaded:', !!colorTargetImages[kz.color.name]);
       autoRevealKippziel(kz.zahl, kz.color);
       bereitsAusgegeben.add(kz.zahl + '_' + kz.color.name);
-
-      // Ensure texture is visible (wait one frame)
-      await sleep(50);
 
       // ==========================================
       // 6) Show target circle + indicators (empty) immediately
@@ -3448,7 +3441,7 @@
       verdecktesCtx.textAlign = 'center';
       verdecktesCtx.textBaseline = 'middle';
       verdecktesCtx.fillText(displayText, 42, 42);
-      verdecktesCanvasTex.needsUpdate = true;
+      refreshVerdecktesTex();
       
       // Puls stoppen, volle Deckkraft
       verdecktesMesh.scale.set(1, 1, 1);
@@ -3590,7 +3583,7 @@
         verdecktesCtx.lineWidth = 1;
         verdecktesCtx.strokeRect(7, 7, 71, 156);
         
-        verdecktesCanvasTex.needsUpdate = true;
+        refreshVerdecktesTex();
         
         // Puls-Animation: kurz größer, dann zurück
         const origScale = 1;
@@ -3640,7 +3633,7 @@
         verdecktesCtx.lineWidth = 4;
         verdecktesCtx.strokeRect(4, 4, 77, 162);
         
-        verdecktesCanvasTex.needsUpdate = true;
+        refreshVerdecktesTex();
         
         // Nach 2s zur nächsten Runde
         setTimeout(() => proceedToNextRound(false), 2000);
