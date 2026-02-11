@@ -1375,11 +1375,14 @@
       await new Promise(r => setTimeout(r, 200));
 
       // 4) Kipps 3-12 zurück nach Q3 (10 weitere Kipps im CW-Zyklus)
-      // Aktuell in Q1, nächste: south_from_q1 (→Q2), west_from_q2 (→Q3), north (→Q0), east (→Q1), ...
+      // Kontinuierlich schneller werdend: 350ms → 120ms
       const remaining = ['south_from_q1','west_from_q2','north','east','south_from_q1','west_from_q2','north','east','south_from_q1','west_from_q2'];
-      for (const dir of remaining) {
-        await loadingKipp(dir, kd);
-        await new Promise(r => setTimeout(r, 80));
+      for (let ri = 0; ri < remaining.length; ri++) {
+        const t = ri / (remaining.length - 1); // 0 → 1
+        const kipDur = Math.round(350 - 230 * t); // 350 → 120
+        const pauseDur = Math.round(80 - 60 * t); // 80 → 20
+        await loadingKipp(remaining[ri], kipDur);
+        await new Promise(r => setTimeout(r, pauseDur));
       }
 
       // Sicherstellen: Würfel liegt exakt in Q3, f2 obenauf
@@ -2738,21 +2741,16 @@
       verdecktesMesh.material = verdecktesMat;
       drawLeernohitOnVerdecktes();
 
-      // 2) Show eye icon below verdecktes
+      // 2) Show eye icon below verdecktes (NO counter yet!)
       const eyeIcon = document.getElementById('eyeIcon');
       const vkPos = new THREE.Vector3().copy(verdecktesMesh.position);
       vkPos.project(camera);
       const vkScreenY = (-vkPos.y * 0.5 + 0.5) * 720;
       eyeIcon.style.top = (vkScreenY + 55) + 'px';
       eyeIcon.style.display = 'block';
+      countdown.style.display = 'none'; // Ensure counter hidden while eye visible
 
-      // 3) Show timer at 0 (not counting yet)
-      countdown.textContent = '0';
-      countdown.style.display = 'block';
-      countdown.style.top = timerTopPos;
-      countdown.style.left = '180px';
-
-      // Pause: let user see the "Entscheidung" state
+      // Pause: let user see the "Entscheidung" state (eye + verdecktes only)
       await sleep(2000);
       if (!autoDemoActive) return;
 
@@ -2761,45 +2759,67 @@
       // ==========================================
       eyeIcon.style.display = 'none';
 
-      // Start SCHAU-timer (continues from previous rounds)
+      // Show "0" (counter replaces eye) but don't start counting yet
+      countdown.textContent = '0';
+      countdown.style.display = 'block';
+      countdown.style.top = timerTopPos;
+      countdown.style.left = '180px';
+
+      await sleep(400); // brief pause before first movement
+
+      // Helper: next CW direction from current quadrant
+      function nextCwDir() {
+        if (currentQuadrant === 3) return 'north';
+        if (currentQuadrant === 0) return 'east';
+        if (currentQuadrant === 1) return 'south_from_q1';
+        return 'west_from_q2'; // Q2
+      }
+      // Helper: next CCW direction from current quadrant
+      function nextCcwDir() {
+        if (currentQuadrant === 3) return 'east_from_q3';
+        if (currentQuadrant === 2) return 'north_from_q2';
+        if (currentQuadrant === 1) return 'west';
+        return 'south'; // Q0
+      }
+
+      // Counter starts counting NOW (first cube movement)
       startCountdown(null, 120);
 
-      // SCHAUEN: Use the edge-wobble technique to see 2 faces at once
-      if (roundIdx === 0) {
-        // First round: thorough look - 3 half-kipp-wobbles
-        // Wobble 1: north → see f2 (top) + f0 (will be top) simultaneously
-        kippDirection = 'cw';
-        await halfKippWithWobble('north', 3, 400);
+      // SCHAUEN: always 3 half-kipp-wobbles CW (sees all 3 face pairs)
+      kippDirection = 'cw';
+      for (let hw = 0; hw < 3; hw++) {
+        const wobbles = 3 - hw; // 3, 2, 1 wobbles (less each time)
+        const pause = (hw < 2) ? 300 : 100;
+        await halfKippWithWobble(nextCwDir(), wobbles, pause);
         if (!autoDemoActive) return;
-        await sleep(300);
-
-        // Wobble 2: east → see f0 (top) + f1 (will be top)
-        await halfKippWithWobble('east', 3, 400);
-        if (!autoDemoActive) return;
-        await sleep(300);
-
-        // Wobble 3: go back west → review f1 + f0 one more time
-        kippDirection = 'ccw';
-        await halfKippWithWobble('west', 2, 200);
-        if (!autoDemoActive) return;
-        await sleep(300);
-      } else if (roundIdx <= 2) {
-        // Rounds 2-3: medium look - 2 half-kipp-wobbles
-        kippDirection = 'cw';
-        await halfKippWithWobble('north', 2, 200);
-        if (!autoDemoActive) return;
-        await sleep(200);
-
-        await halfKippWithWobble('east', 2, 200);
-        if (!autoDemoActive) return;
-        await sleep(200);
-      } else {
-        // Rounds 4-6: quick glance - 1 half-kipp-wobble (player knows the cube)
-        kippDirection = 'cw';
-        await halfKippWithWobble('north', 1, 0);
-        if (!autoDemoActive) return;
-        await sleep(200);
+        if (hw < 2) await sleep(200);
       }
+
+      // Random extra move: a) none, b) 1 back, c) 1 forward, d) 2 back
+      const extraOption = Math.floor(Math.random() * 4);
+      if (extraOption === 1) {
+        // b) one back
+        kippDirection = 'ccw';
+        await sleep(300);
+        await halfKippWithWobble(nextCcwDir(), 2, 100);
+        if (!autoDemoActive) return;
+      } else if (extraOption === 2) {
+        // c) one more forward
+        kippDirection = 'cw';
+        await sleep(300);
+        await halfKippWithWobble(nextCwDir(), 2, 100);
+        if (!autoDemoActive) return;
+      } else if (extraOption === 3) {
+        // d) two back
+        kippDirection = 'ccw';
+        await sleep(300);
+        await halfKippWithWobble(nextCcwDir(), 2, 200);
+        if (!autoDemoActive) return;
+        await sleep(200);
+        await halfKippWithWobble(nextCcwDir(), 1, 0);
+        if (!autoDemoActive) return;
+      }
+      // a) = no extra (just fall through)
 
       // Stop SCHAU timer
       stopCountdown();
