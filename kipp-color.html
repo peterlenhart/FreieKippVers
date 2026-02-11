@@ -485,6 +485,7 @@
     }
     #btnTutorial { top: 451px; padding-top: 4px; }
     #btnSpielen  { top: 519px; padding-top: 4px; font-size: 18px; letter-spacing: 2.5px; }
+    #btnDemo     { top: 587px; padding-top: 4px; font-size: 14px; letter-spacing: 1.5px; }
 
     /* === ZURUECK-BUTTON (zur Startseite) === */
   </style>
@@ -497,6 +498,7 @@
     <div id="startBackBtn" style="position:absolute; top:0; left:0; width:90px; height:90px; cursor:pointer; pointer-events:auto; z-index:310;"></div>
     <button class="startClickZone" id="btnTutorial" disabled style="opacity:0.4">SPIEL MIT ANLEITUNG</button>
     <button class="startClickZone" id="btnSpielen" disabled style="opacity:0.4">SPIELEN</button>
+    <button class="startClickZone" id="btnDemo" disabled style="opacity:0.4">DEMO</button>
   </div>
   
   <div id="uiOverlay">
@@ -544,7 +546,7 @@
         k1:"SCHAUEN & MERKEN", k2:"Kippe den W\u00fcrfel in der Box in beliebige Richtung von Ecke zu Ecke. Merke dir m\u00f6glichst viele Zahlenpositionen in m\u00f6glichst kurzer Zeit (Nutze SCHAU-Sek. effektiv).<br>Nach dem SCHAUEN deckst du hier links dein erstes von sechs Kippzielen auf.",
         p1:"TIPPEN & SCHUBSEN", p2:"Das Kippziel links zeigt: <b>{zahl}</b> muss zu <b>{farbe}</b> gekippt werden.<br><b>TIPPE</b> ein- bis sechsmal auf den W\u00fcrfel.<br><b>SCHUBSE</b> ihn anschlie\u00dfend in die gew\u00fcnschte Richtung, um den Kippzug auszul\u00f6sen.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} SCHAU-Sekunden", bw:"Best: 100% | Worst: 12%",
-        ma:"SPIEL MIT ANLEITUNG", sp:"SPIELEN",
+        ma:"SPIEL MIT ANLEITUNG", sp:"SPIELEN", dm:"DEMO ANSEHEN",
         fV:"Violett", fB:"Blau", fG:"Gr\u00fcn", fO:"Orange"
       },
       "en": {
@@ -554,7 +556,7 @@
         k1:"LOOK & REMEMBER", k2:"Tip the cube inside the box in any direction from corner to corner. Memorize as many number positions as possible in the shortest time (Use LOOK seconds efficiently).<br>After LOOKING, uncover your first of six targets here on the left.",
         p1:"TAP & PUSH", p2:"The target on the left shows: <b>{zahl}</b> must reach <b>{farbe}</b>.<br><b>TAP</b> the cube one to six times.<br><b>PUSH</b> it in the desired direction to trigger the tipping move.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} LOOK seconds", bw:"Best: 100% | Worst: 12%",
-        ma:"PLAY WITH TUTORIAL", sp:"PLAY",
+        ma:"PLAY WITH TUTORIAL", sp:"PLAY", dm:"WATCH DEMO",
         fV:"Violet", fB:"Blue", fG:"Green", fO:"Orange"
       },
       "es": {
@@ -564,7 +566,7 @@
         k1:"MIRAR & RECORDAR", k2:"Volca el cubo dentro de la caja en cualquier direcci\u00f3n de esquina a esquina. Memoriza tantas posiciones de n\u00fameros como sea posible en el menor tiempo (Usa los segundos de MIRAR eficientemente).<br>Despu\u00e9s de MIRAR, descubre aqu\u00ed a la izquierda tu primer objetivo de seis.",
         p1:"TOCAR & EMPUJAR", p2:"El objetivo a la izquierda muestra: <b>{zahl}</b> debe llegar a <b>{farbe}</b>.<br><b>TOCA</b> el cubo de una a seis veces.<br><b>EMPUJA</b> en la direcci\u00f3n deseada para activar el volcado.",
         bs:"BRAIN SCORE", nh:"Sin acierto, sin puntos", st:"{t} ACIERTOS | {z} seg. de MIRAR", bw:"Mejor: 100% | Peor: 12%",
-        ma:"JUGAR CON GU\u00cdA", sp:"JUGAR",
+        ma:"JUGAR CON GU\u00cdA", sp:"JUGAR", dm:"VER DEMO",
         fV:"Violeta", fB:"Azul", fG:"Verde", fO:"Naranja"
       },
       "fr": {
@@ -574,7 +576,7 @@
         k1:"REGARDER & RETENIR", k2:"Bascule le cube dans la bo\u00eete dans n\u2019importe quelle direction de coin en coin. M\u00e9morise autant de positions de chiffres que possible en un minimum de temps (Utilise les secondes de REGARD efficacement).<br>Apr\u00e8s avoir REGARD\u00c9, d\u00e9couvre ici \u00e0 gauche ta premi\u00e8re cible sur six.",
         p1:"TAPER & POUSSER", p2:"La cible \u00e0 gauche indique : <b>{zahl}</b> doit atteindre <b>{farbe}</b>.<br><b>TAPE</b> une \u00e0 six fois sur le cube.<br><b>POUSSE</b>-le dans la direction souhait\u00e9e pour d\u00e9clencher le basculement.",
         bs:"BRAIN SCORE", nh:"Aucun coup, aucun score", st:"{t} COUPS | {z} sec. de REGARD", bw:"Meilleur: 100% | Pire: 12%",
-        ma:"JOUER AVEC GUIDE", sp:"JOUER",
+        ma:"JOUER AVEC GUIDE", sp:"JOUER", dm:"VOIR LA D\u00c9MO",
         fV:"Violet", fB:"Bleu", fG:"Vert", fO:"Orange"
       },
       "it": {
@@ -584,7 +586,7 @@
         k1:"GUARDA & RICORDA", k2:"Ribalta il cubo nella scatola in qualsiasi direzione da angolo ad angolo. Memorizza quante pi\u00f9 posizioni di numeri possibile nel minor tempo (Usa i secondi di GUARDA in modo efficiente).<br>Dopo aver GUARDATO, scopri qui a sinistra il tuo primo bersaglio su sei.",
         p1:"TOCCA & SPINGI", p2:"Il bersaglio a sinistra mostra: <b>{zahl}</b> deve raggiungere <b>{farbe}</b>.<br><b>TOCCA</b> il cubo da una a sei volte.<br><b>SPINGI</b> nella direzione desiderata per attivare il ribaltamento.",
         bs:"BRAIN SCORE", nh:"Nessun colpo, nessun punteggio", st:"{t} COLPI | {z} sec. di GUARDA", bw:"Migliore: 100% | Peggiore: 12%",
-        ma:"GIOCA CON GUIDA", sp:"GIOCARE",
+        ma:"GIOCA CON GUIDA", sp:"GIOCARE", dm:"GUARDA DEMO",
         fV:"Viola", fB:"Blu", fG:"Verde", fO:"Arancione"
       },
       "tr": {
@@ -594,13 +596,14 @@
         k1:"BAK & HATIRLA", k2:"K\u00fcp\u00fc kutunun i\u00e7inde herhangi bir y\u00f6ne k\u00f6\u015feden k\u00f6\u015feye devir. M\u00fcmk\u00fcn oldu\u011funca \u00e7ok say\u0131 pozisyonunu en k\u0131sa s\u00fcrede ezberle (BAKMA saniyelerini verimli kullan).<br>BAKTIKTAN sonra burada solda alt\u0131 hedefinden ilkini a\u00e7.",
         p1:"DOKUN & \u0130T", p2:"Soldaki hedef g\u00f6steriyor: <b>{zahl}</b> \u2192 <b>{farbe}</b> olmal\u0131.<br>K\u00fcpe <b>bir ile alt\u0131</b> kez <b>DOKUN</b>.<br>Sonra istedi\u011fin y\u00f6ne <b>\u0130T</b> ve devrilmeyi ba\u015flat.",
         bs:"BRAIN SCORE", nh:"\u0130sabet yok, puan yok", st:"{t} \u0130SABET | {z} BAKMA saniyesi", bw:"En iyi: 100% | En k\u00f6t\u00fc: 12%",
-        ma:"REHBERL\u0130 OYNA", sp:"OYNA",
+        ma:"REHBERL\u0130 OYNA", sp:"OYNA", dm:"DEMOYU \u0130ZLE",
         fV:"Mor", fB:"Mavi", fG:"Ye\u015fil", fO:"Turuncu"
       }
     }[_digikippLang];
     if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
     document.getElementById("btnTutorial").textContent = T.ma;
     document.getElementById("btnSpielen").textContent = T.sp;
+    document.getElementById("btnDemo").textContent = T.dm;
 
     // =========================
     // Scene Setup
@@ -1397,6 +1400,8 @@
         document.getElementById('btnTutorial').style.opacity = '1';
         document.getElementById('btnSpielen').disabled = false;
         document.getElementById('btnSpielen').style.opacity = '1';
+        document.getElementById('btnDemo').disabled = false;
+        document.getElementById('btnDemo').style.opacity = '1';
         actionButton.disabled = false;
       }
     }
@@ -2342,6 +2347,393 @@
     }
     let timerTopPos = null;
     // === START-OVERLAY: Warten auf Spieler-Wahl ===
+    // =========================
+    // AUTO-DEMO MODULE
+    // =========================
+    let autoDemoActive = false;
+
+    // Solver: Find (steps, direction) to reach target (zahl + color) from current state
+    function solveKippziel(zahl, colorName, fromQ, fromFace) {
+      const faceOff = { f0: 0, f1: 4, f2: 8 };
+      let targetFace = null, targetQ = null;
+      for (const face of ['f0', 'f1', 'f2']) {
+        const off = faceOff[face];
+        const slots = ['S1', 'S2', 'S3', 'S4'];
+        for (let i = 0; i < 4; i++) {
+          if (deck[off + i] === zahl) {
+            for (let q = 0; q < 4; q++) {
+              if (SLOT_NEIGHBOR_COLORS[q][slots[i]] === colorName) {
+                targetFace = face; targetQ = q;
+                break;
+              }
+            }
+          }
+          if (targetFace) break;
+        }
+        if (targetFace) break;
+      }
+      if (!targetFace) return null;
+      const cwF = { f2: 'f0', f0: 'f1', f1: 'f2' };
+      const ccwF = { f2: 'f1', f1: 'f0', f0: 'f2' };
+      const cwQ = { 3: 0, 0: 1, 1: 2, 2: 3 };
+      const ccwQ = { 3: 2, 2: 1, 1: 0, 0: 3 };
+      // Try CW
+      let sQ = fromQ, sF = fromFace;
+      for (let s = 1; s <= 6; s++) {
+        sQ = cwQ[sQ]; sF = cwF[sF];
+        if (sQ === targetQ && sF === targetFace) return { steps: s, dir: 'cw' };
+      }
+      // Try CCW
+      sQ = fromQ; sF = fromFace;
+      for (let s = 1; s <= 6; s++) {
+        sQ = ccwQ[sQ]; sF = ccwF[sF];
+        if (sQ === targetQ && sF === targetFace) return { steps: s, dir: 'ccw' };
+      }
+      return null;
+    }
+
+    // Draw kippziel on verdecktes mesh without side effects
+    function autoRevealKippziel(zahl, colorObj) {
+      erstesKippziel = { zahl: zahl, color: colorObj };
+      const img = colorTargetImages[colorObj.name];
+      if (!img) return;
+      verdecktesCtx.clearRect(0, 0, 85, 170);
+      verdecktesCtx.drawImage(img, 0, 0, 85, 170);
+      const displayText = zahl + ((zahl === 6 || zahl === 9) ? '.' : '');
+      verdecktesCtx.fillStyle = '#2a1810';
+      verdecktesCtx.font = 'bold 56px Arial';
+      verdecktesCtx.textAlign = 'center';
+      verdecktesCtx.textBaseline = 'middle';
+      verdecktesCtx.fillText(displayText, 42, 42);
+      verdecktesCanvasTex.needsUpdate = true;
+      verdecktesMesh.scale.set(1, 1, 1);
+      verdecktesMat.opacity = 1;
+      verdecktesMesh.userData.revealed = true;
+    }
+
+    // Perform N kipps in given direction (no game-state side effects)
+    async function autoPerformKipps(steps, dir) {
+      for (let i = 0; i < steps; i++) {
+        let direction;
+        if (dir === 'cw') {
+          if (currentQuadrant === 0) direction = 'east';
+          else if (currentQuadrant === 1) direction = 'south_from_q1';
+          else if (currentQuadrant === 2) direction = 'west_from_q2';
+          else direction = 'north';
+        } else {
+          if (currentQuadrant === 0) direction = 'south';
+          else if (currentQuadrant === 1) direction = 'west';
+          else if (currentQuadrant === 2) direction = 'north_from_q2';
+          else direction = 'east_from_q3';
+        }
+        isAnimating = false;
+        kippDirection = dir;
+        await performKipp(direction, 700);
+        advanceTopFace();
+        if (i < steps - 1) await sleep(300);
+      }
+      isAnimating = false;
+    }
+
+    // Show HIT/MISS on verdecktes mesh (no proceedToNextRound timer)
+    function autoDemoShowResult(isHit) {
+      if (isHit) {
+        verdecktesCtx.shadowColor = '#FFD700';
+        verdecktesCtx.shadowBlur = 12;
+        verdecktesCtx.strokeStyle = '#FFD700';
+        verdecktesCtx.lineWidth = 4;
+        verdecktesCtx.strokeRect(4, 4, 77, 162);
+        verdecktesCtx.shadowBlur = 0;
+        verdecktesCtx.strokeStyle = '#FFF0A0';
+        verdecktesCtx.lineWidth = 1;
+        verdecktesCtx.strokeRect(7, 7, 71, 156);
+        verdecktesCanvasTex.needsUpdate = true;
+        // Pulse animation
+        const startTime = performance.now();
+        function pulseTick(now) {
+          const t = Math.min((now - startTime) / 300, 1);
+          const s = t < 0.5 ? 1 + 0.25 * (t * 2) : 1.25 - 0.25 * ((t - 0.5) * 2);
+          verdecktesMesh.scale.set(s, s, s);
+          if (t < 1) requestAnimationFrame(pulseTick);
+          else verdecktesMesh.scale.set(1, 1, 1);
+        }
+        requestAnimationFrame(pulseTick);
+      } else {
+        const img = colorTargetImages[erstesKippziel.color.name];
+        if (img) {
+          verdecktesCtx.clearRect(0, 0, 85, 170);
+          verdecktesCtx.drawImage(img, 0, 0, 85, 170);
+          verdecktesCtx.globalCompositeOperation = 'saturation';
+          verdecktesCtx.fillStyle = 'hsl(0, 40%, 50%)';
+          verdecktesCtx.fillRect(0, 0, 85, 170);
+          verdecktesCtx.globalCompositeOperation = 'source-over';
+          const displayText = erstesKippziel.zahl + ((erstesKippziel.zahl === 6 || erstesKippziel.zahl === 9) ? '.' : '');
+          verdecktesCtx.fillStyle = '#888888';
+          verdecktesCtx.font = 'bold 56px Arial';
+          verdecktesCtx.textAlign = 'center';
+          verdecktesCtx.textBaseline = 'middle';
+          verdecktesCtx.fillText(displayText, 42, 42);
+        }
+        verdecktesCtx.strokeStyle = '#FF2020';
+        verdecktesCtx.lineWidth = 2;
+        verdecktesCtx.strokeRect(1, 1, 83, 168);
+        verdecktesCtx.lineWidth = 4;
+        verdecktesCtx.strokeRect(4, 4, 77, 162);
+        verdecktesCanvasTex.needsUpdate = true;
+      }
+    }
+
+    // Transfer verdecktes visual to gameCard
+    function autoDemoTransferToCard(idx) {
+      const card = gameCards[idx];
+      card.ctx.clearRect(0, 0, 85, 170);
+      card.ctx.drawImage(verdecktesCanvas, 0, 0);
+      card.texture.needsUpdate = true;
+      card.mesh.material.map = card.texture;
+      card.mesh.material.transparent = false;
+      card.mesh.material.opacity = 1;
+      card.mesh.material.needsUpdate = true;
+      card.mesh.visible = true;
+    }
+
+    // === MAIN AUTO-DEMO ORCHESTRATOR ===
+    async function runAutoDemo() {
+      autoDemoActive = true;
+      gamePhase = 'autoDemo';
+
+      // Hide start overlay
+      document.getElementById('startOverlay').style.display = 'none';
+
+      // Reset cube to Q3, f2
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      cube.quaternion.set(0, 0, 0, 1);
+      currentQuadrant = 3;
+      topFace = 'f2';
+      kippDirection = 'cw';
+      isAnimating = false;
+
+      // Reset game state
+      activeCardIdx = 0;
+      bereitsGetroffen.clear();
+      bereitsAusgegeben.clear();
+      kippzielChecked = false;
+      erstesKippziel = null;
+      tapCount = 0;
+      kippCount = 0;
+      totalObservationTime = 0;
+      lockedKippDir = null;
+
+      // Reset cards
+      gameCards.forEach(c => { c.mesh.visible = false; c.zahl = null; c.color = null; c.isHit = false; c.isMiss = false; });
+
+      // Hide all UI
+      document.getElementById('spielZielText').style.display = 'none';
+      document.getElementById('instructionText').style.display = 'none';
+      document.getElementById('tutorialText').style.display = 'none';
+      document.getElementById('entscheidungText').style.display = 'none';
+      document.getElementById('eyeIcon').style.display = 'none';
+      document.getElementById('kippTarget').style.display = 'none';
+      document.getElementById('brainScore').style.display = 'none';
+      actionButton.style.display = 'none';
+      countdown.style.display = 'none';
+      hintText.style.display = 'none';
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
+
+      // Show reset button
+      resetButton.style.display = 'block';
+      const resetPos3D = new THREE.Vector3(-0.625, 0.46875, -0.828125 + 0.15625);
+      resetPos3D.project(camera);
+      resetButton.style.left = ((resetPos3D.x * 0.5 + 0.5) * 360) + 'px';
+      resetButton.style.top = (((-resetPos3D.y * 0.5 + 0.5) * 720) - 28) + 'px';
+
+      // Show verdecktes at position 0, pulsing
+      verdecktesMesh.position.set(cardStartX, cardY + 0.001, cardZ);
+      drawLeernohitOnVerdecktes();
+      verdecktesMesh.visible = true;
+      verdecktesMesh.userData.revealed = false;
+      verdecktesMesh.scale.set(1, 1, 1);
+      verdecktesMat.opacity = 1;
+
+      // ==========================================
+      // PHASE 1: SCHAUEN (Look at the cube)
+      // ==========================================
+      await sleep(1200);
+
+      // Start SCHAU-timer
+      totalObservationTime = 0;
+      startCountdown(null, 120);
+
+      // Kipp 1: north → Q0, f0 on top
+      kippDirection = 'cw';
+      isAnimating = false;
+      await performKipp('north', 800);
+      advanceTopFace();
+      isAnimating = false;
+      await sleep(1000);
+
+      // Kipp 2: east → Q1, f1 on top
+      isAnimating = false;
+      await performKipp('east', 800);
+      advanceTopFace();
+      isAnimating = false;
+      await sleep(1200);
+
+      // Kipp 3: go back west → Q0, face changes via ccw
+      kippDirection = 'ccw';
+      isAnimating = false;
+      await performKipp('west', 800);
+      advanceTopFace();
+      isAnimating = false;
+      await sleep(600);
+
+      // Stop SCHAU timer
+      stopCountdown();
+      countdown.style.display = 'none';
+
+      // Now at Q0, topFace = ccw from f1 → f0
+      // State: Q0, f0
+      console.log('After SCHAUEN: Q=' + currentQuadrant + ' face=' + topFace);
+
+      // ==========================================
+      // PHASE 2: REVEAL KIPPZIEL 1
+      // ==========================================
+      const erfuellteKombis1 = getCurrentErfuellteKombis();
+      let kz1 = generateNeueKombiOhne(erfuellteKombis1);
+      if (!kz1) kz1 = generateNeueKombiOhne(new Set());
+
+      // Flip-reveal animation
+      autoRevealKippziel(kz1.zahl, kz1.color);
+      bereitsAusgegeben.add(kz1.zahl + '_' + kz1.color.name);
+
+      await sleep(2000); // "thinking" pause
+
+      // ==========================================
+      // PHASE 3: SOLVE & EXECUTE - ROUND 1 (HIT)
+      // ==========================================
+      const sol1 = solveKippziel(kz1.zahl, kz1.color.name, currentQuadrant, topFace);
+      console.log('Round 1 solution:', sol1, 'for', kz1.zahl, kz1.color.name);
+
+      if (!sol1) {
+        console.error('No solution found!');
+        autoDemoActive = false;
+        backToStartScreen();
+        return;
+      }
+
+      // Show target circle
+      kippDirection = sol1.dir;
+      updateKippTargetPosition();
+      document.getElementById('kippTarget').style.display = 'block';
+
+      // Animate taps (one by one, like a thoughtful player)
+      tapCount = 0;
+      for (let i = 1; i <= sol1.steps; i++) {
+        tapCount = i;
+        updateTapIndicators();
+        await sleep(420);
+      }
+      await sleep(700); // pause before execution
+
+      // Hide indicators, execute kipps
+      document.getElementById('kippTarget').style.display = 'none';
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
+
+      await autoPerformKipps(sol1.steps, sol1.dir);
+      await sleep(500);
+
+      // Show HIT!
+      autoDemoShowResult(true);
+      await sleep(2500);
+
+      // Transfer to gameCard 0
+      autoDemoTransferToCard(0);
+      bereitsGetroffen.add(kz1.zahl + '_' + kz1.color.name);
+
+      // ==========================================
+      // PHASE 4: TRANSITION TO ROUND 2
+      // ==========================================
+      activeCardIdx = 1;
+      const nextX = cardStartX + 1 * (cardWidth + cardGap);
+      verdecktesMesh.position.set(nextX, cardY + 0.001, cardZ);
+      verdecktesMesh.userData.revealed = false;
+      drawLeernohitOnVerdecktes();
+      verdecktesMesh.scale.set(1, 1, 1);
+      verdecktesMat.opacity = 1;
+
+      await sleep(1500);
+
+      // ==========================================
+      // PHASE 5: REVEAL KIPPZIEL 2
+      // ==========================================
+      const erfuellteKombis2 = getCurrentErfuellteKombis();
+      let kz2 = generateNeueKombiOhne(erfuellteKombis2);
+      if (!kz2) kz2 = generateNeueKombiOhne(new Set());
+
+      autoRevealKippziel(kz2.zahl, kz2.color);
+      bereitsAusgegeben.add(kz2.zahl + '_' + kz2.color.name);
+
+      await sleep(2000);
+
+      // ==========================================
+      // PHASE 6: SOLVE & EXECUTE - ROUND 2 (MISS!)
+      // ==========================================
+      const sol2 = solveKippziel(kz2.zahl, kz2.color.name, currentQuadrant, topFace);
+      console.log('Round 2 solution:', sol2, 'for', kz2.zahl, kz2.color.name);
+
+      if (!sol2) {
+        console.error('No solution found!');
+        autoDemoActive = false;
+        backToStartScreen();
+        return;
+      }
+
+      kippDirection = sol2.dir;
+
+      // Deliberately wrong: 1 extra kipp (the "miscalculation")
+      const wrongSteps = (sol2.steps < 6) ? sol2.steps + 1 : sol2.steps - 1;
+
+      updateKippTargetPosition();
+      document.getElementById('kippTarget').style.display = 'block';
+
+      // Animate wrong number of taps
+      tapCount = 0;
+      for (let i = 1; i <= wrongSteps; i++) {
+        tapCount = i;
+        updateTapIndicators();
+        await sleep(420);
+      }
+      await sleep(700);
+
+      document.getElementById('kippTarget').style.display = 'none';
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
+
+      await autoPerformKipps(wrongSteps, sol2.dir);
+      await sleep(500);
+
+      // Show MISS
+      autoDemoShowResult(false);
+      await sleep(2500);
+
+      // Transfer to gameCard 1
+      autoDemoTransferToCard(1);
+
+      verdecktesMesh.visible = false;
+
+      // ==========================================
+      // PHASE 7: BACK TO START
+      // ==========================================
+      await sleep(2000);
+
+      autoDemoActive = false;
+      backToStartScreen();
+    }
+
+    // =========================
+    // BUTTON EVENT LISTENERS
+    // =========================
     document.getElementById('btnTutorial').addEventListener('click', () => {
       if (!texturesReady) return;
       document.getElementById('startOverlay').style.display = 'none';
@@ -2353,6 +2745,10 @@
       document.getElementById('startOverlay').style.display = 'none';
       isReplay = true;
       initSpielzielPhase();
+    });
+    document.getElementById('btnDemo').addEventListener('click', () => {
+      if (!texturesReady) return;
+      runAutoDemo();
     });
     
     document.getElementById('startBackBtn').addEventListener('click', () => {
@@ -2375,6 +2771,7 @@
       document.getElementById('startOverlay').style.display = 'block';
       document.getElementById('btnTutorial').textContent = T.ma;
       document.getElementById('btnSpielen').textContent = T.sp;
+      document.getElementById('btnDemo').textContent = T.dm;
       gamePhase = 'start';
     }
     
@@ -3080,6 +3477,9 @@
         window.location.href = 'index.html';
         return;
       }
+      
+      // Abort auto-demo if active
+      autoDemoActive = false;
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
