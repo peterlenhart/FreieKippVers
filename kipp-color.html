@@ -2404,6 +2404,7 @@
     let autoDemoActive = false;
     let demoPauseResolve = null;
     let demoCycleInterval = null;
+    let savedDemoData = null; // {kombi, extraOption} from first run
 
     // === SUBTITLE ENGINE ===
     const subEl = document.getElementById('demoSubtitle');
@@ -2869,8 +2870,9 @@
           if (hw < 2) await sleep(200);
         }
 
-        // Random extra move
-        const extraOption = Math.floor(Math.random() * 4);
+        // Random extra move (saved for replay)
+        const extraOption = savedDemoData ? savedDemoData.extraOption : Math.floor(Math.random() * 4);
+        if (!savedDemoData) savedDemoData = { extraOption: extraOption, kombi: null };
         if (extraOption === 1) {
           kippDirection = 'ccw';
           await sleep(300);
@@ -2930,10 +2932,16 @@
       // ==========================================
       console.log('Round ' + roundIdx + ' after SCHAUEN: Q=' + currentQuadrant + ' face=' + topFace);
 
-      const erfuellteKombis = getCurrentErfuellteKombis();
-      let kz = generateNeueKombiOhne(erfuellteKombis);
-      if (!kz) kz = generateNeueKombiOhne(new Set());
-      if (!kz) { console.error('No kombi available!'); return; }
+      let kz;
+      if (savedDemoData && savedDemoData.kombi) {
+        kz = savedDemoData.kombi;
+      } else {
+        const erfuellteKombis = getCurrentErfuellteKombis();
+        kz = generateNeueKombiOhne(erfuellteKombis);
+        if (!kz) kz = generateNeueKombiOhne(new Set());
+        if (!kz) { console.error('No kombi available!'); return; }
+        if (savedDemoData) savedDemoData.kombi = kz;
+      }
 
       console.log('Revealing Kippziel:', kz.zahl, kz.color.name, 'img loaded:', !!colorTargetImages[kz.color.name]);
       autoRevealKippziel(kz.zahl, kz.color);
@@ -3804,6 +3812,7 @@
       // During demo pause → start real game
       if (gamePhase === 'autoDemo' && demoPauseResolve) {
         autoDemoActive = false;
+        savedDemoData = null;
         if (demoCycleInterval) { clearInterval(demoCycleInterval); demoCycleInterval = null; }
         hideSubtitle();
         demoPauseResolve('play');
@@ -3836,6 +3845,7 @@
       
       // Abort auto-demo if active
       autoDemoActive = false;
+      savedDemoData = null;
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
