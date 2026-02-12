@@ -412,6 +412,76 @@
       display: none;
     }
 
+    #transportBar {
+      display: none;
+      position: absolute;
+      left: 0;
+      width: 360px;
+      height: 60px;
+      pointer-events: none;
+      z-index: 320;
+    }
+    #btnSelbstSpielen {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: auto;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(192,184,168,0.5);
+      border-radius: 6px;
+      color: #c0b8a8;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 8px 10px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+    #btnSelbstSpielen:active { transform: translateY(-50%) scale(0.92); }
+    #speedArrows {
+      position: absolute;
+      right: 75px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 90px;
+      height: 50px;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .speedArrow {
+      position: absolute;
+      top: 0;
+      height: 50px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+      display: none;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    #arrow1 { left: 0; display: block; opacity: 0.45; }
+    #arrow2 { left: 18px; }
+    #arrow3 { left: 36px; }
+    #btnSkipEnd {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 50px;
+      width: auto;
+      object-fit: contain;
+      pointer-events: auto;
+      cursor: pointer;
+      opacity: 0.45;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+      transition: opacity 0.2s;
+    }
+    #btnSkipEnd:active { transform: translateY(-50%) scale(0.88); }
+    .speedArrow.active { display: block; opacity: 1; filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
+    #btnSkipEnd.active { opacity: 1; filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
+
     #backButton {
       display: none;
       position: absolute;
@@ -532,6 +602,15 @@
     <button id="actionButton"></button>
     <button id="backButton">↻</button>
     <button id="resetButton"><svg viewBox="0 0 24 24" fill="none" stroke="#c0b8a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+    <div id="transportBar">
+      <button id="btnSelbstSpielen"></button>
+      <div id="speedArrows">
+        <img id="arrow1" class="speedArrow" src="playarrow.png" />
+        <img id="arrow2" class="speedArrow" src="playarrow.png" />
+        <img id="arrow3" class="speedArrow" src="playarrow.png" />
+      </div>
+      <img id="btnSkipEnd" src="skipend.png" />
+    </div>
     
     <div id="richtungButtons" class="hidden" style="position:absolute;top:540px;left:50%;transform:translateX(-50%);display:flex;gap:21px;width:180px;z-index:200;">
       <button id="cwBtn" class="kippBtn" style="flex:1;height:45px;font-size:40px;line-height:1;position:relative;"><span style="position:absolute;top:calc(50% - 3px);left:50%;transform:translate(-50%,-50%);font-size:40px;">↻</span></button>
@@ -562,7 +641,7 @@
         k1:"SCHAUEN & MERKEN", k2:"Kippe den W\u00fcrfel in der Box in beliebige Richtung von Ecke zu Ecke. Merke dir m\u00f6glichst viele Zahlenpositionen in m\u00f6glichst kurzer Zeit (Nutze SCHAU-Sek. effektiv).<br>Nach dem SCHAUEN deckst du hier links dein erstes von sechs Kippzielen auf.",
         p1:"TIPPEN & SCHUBSEN", p2:"Das Kippziel links zeigt: <b>{zahl}</b> muss zu <b>{farbe}</b> gekippt werden.<br><b>TIPPE</b> ein- bis sechsmal auf den W\u00fcrfel.<br><b>SCHUBSE</b> ihn anschlie\u00dfend in die gew\u00fcnschte Richtung, um den Kippzug auszul\u00f6sen.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} SCHAU-Sekunden", bw:"Best: 100% | Worst: 12%",
-        ma:"SPIEL MIT ANLEITUNG", sp:"SPIELEN", dm:"DEMO ANSEHEN",
+        ma:"SPIEL MIT ANLEITUNG", sp:"SPIELEN", dm:"DEMO ANSEHEN", ss:"selber spielen",
         d1:["Nach Klick aufs Auge<br>l\u00e4sst sich der W\u00fcrfel","mit dem Finger<br>durch die Box kippen."],
         d1b:["Auf Kante wippen,<br>Zahlenpositionen merken.","Auf Kante wippen,<br>Zahlenpositionen merken.","Der Counter z\u00e4hlt<br>die SCHAU-Sekunden.","Nutze SCHAU-Sek. sparsam,<br>sie verschlechtern deinen","BRAIN SCORE<br>(Endauswertung)."],
         d2:"Klick dir dein KIPP ZIEL.",
@@ -577,7 +656,7 @@
         k1:"LOOK & REMEMBER", k2:"Tip the cube inside the box in any direction from corner to corner. Memorize as many number positions as possible in the shortest time (Use LOOK seconds efficiently).<br>After LOOKING, uncover your first of six targets here on the left.",
         p1:"TAP & PUSH", p2:"The target on the left shows: <b>{zahl}</b> must reach <b>{farbe}</b>.<br><b>TAP</b> the cube one to six times.<br><b>PUSH</b> it in the desired direction to trigger the tipping move.",
         bs:"BRAIN SCORE", nh:"No Hit, no Score", st:"{t} HITS | {z} LOOK seconds", bw:"Best: 100% | Worst: 12%",
-        ma:"PLAY WITH TUTORIAL", sp:"PLAY", dm:"WATCH DEMO",
+        ma:"PLAY WITH TUTORIAL", sp:"PLAY", dm:"WATCH DEMO", ss:"play yourself",
         d1:["After clicking the eye<br>you can tip the cube","with your finger<br>through the box."],
         d1b:["Tilt to the edge,<br>memorize number positions.","Tilt to the edge,<br>memorize number positions.","The counter counts<br>your LOOK seconds.","Use LOOK sec. sparingly,<br>they worsen your","BRAIN SCORE<br>(final rating)."],
         d2:"Click to reveal your TARGET.",
@@ -592,7 +671,7 @@
         k1:"MIRAR & RECORDAR", k2:"Volca el cubo dentro de la caja en cualquier direcci\u00f3n de esquina a esquina. Memoriza tantas posiciones de n\u00fameros como sea posible en el menor tiempo (Usa los segundos de MIRAR eficientemente).<br>Despu\u00e9s de MIRAR, descubre aqu\u00ed a la izquierda tu primer objetivo de seis.",
         p1:"TOCAR & EMPUJAR", p2:"El objetivo a la izquierda muestra: <b>{zahl}</b> debe llegar a <b>{farbe}</b>.<br><b>TOCA</b> el cubo de una a seis veces.<br><b>EMPUJA</b> en la direcci\u00f3n deseada para activar el volcado.",
         bs:"BRAIN SCORE", nh:"Sin acierto, sin puntos", st:"{t} ACIERTOS | {z} seg. de MIRAR", bw:"Mejor: 100% | Peor: 12%",
-        ma:"JUGAR CON GU\u00cdA", sp:"JUGAR", dm:"VER DEMO",
+        ma:"JUGAR CON GU\u00cdA", sp:"JUGAR", dm:"VER DEMO", ss:"jugar solo",
         d1:["Tras pulsar el ojo<br>puedes volcar el cubo","con el dedo<br>por la caja."],
         d1b:["Inclinar al borde,<br>memoriza las posiciones.","Inclinar al borde,<br>memoriza las posiciones.","El contador cuenta<br>tus segundos de MIRAR.","Usa seg. MIRA con cuidado,<br>empeoran tu","BRAIN SCORE<br>(evaluaci\u00f3n final)."],
         d2:"Pulsa para ver tu OBJETIVO.",
@@ -607,7 +686,7 @@
         k1:"REGARDER & RETENIR", k2:"Bascule le cube dans la bo\u00eete dans n\u2019importe quelle direction de coin en coin. M\u00e9morise autant de positions de chiffres que possible en un minimum de temps (Utilise les secondes de REGARD efficacement).<br>Apr\u00e8s avoir REGARD\u00c9, d\u00e9couvre ici \u00e0 gauche ta premi\u00e8re cible sur six.",
         p1:"TAPER & POUSSER", p2:"La cible \u00e0 gauche indique : <b>{zahl}</b> doit atteindre <b>{farbe}</b>.<br><b>TAPE</b> une \u00e0 six fois sur le cube.<br><b>POUSSE</b>-le dans la direction souhait\u00e9e pour d\u00e9clencher le basculement.",
         bs:"BRAIN SCORE", nh:"Aucun coup, aucun score", st:"{t} COUPS | {z} sec. de REGARD", bw:"Meilleur: 100% | Pire: 12%",
-        ma:"JOUER AVEC GUIDE", sp:"JOUER", dm:"VOIR LA D\u00c9MO",
+        ma:"JOUER AVEC GUIDE", sp:"JOUER", dm:"VOIR LA D\u00c9MO", ss:"jouer soi-même",
         d1:["Apr\u00e8s clic sur l\u2019\u0153il<br>tu peux basculer le cube","avec le doigt<br>dans la bo\u00eete."],
         d1b:["Basculer sur l\u2019ar\u00eate,<br>m\u00e9morise les positions.","Basculer sur l\u2019ar\u00eate,<br>m\u00e9morise les positions.","Le compteur compte<br>tes secondes de REGARD.","Utilise les sec. REGARD<br>avec parcimonie,","elles d\u00e9gradent ton<br>BRAIN SCORE."],
         d2:"Clique pour r\u00e9v\u00e9ler ta CIBLE.",
@@ -622,7 +701,7 @@
         k1:"GUARDA & RICORDA", k2:"Ribalta il cubo nella scatola in qualsiasi direzione da angolo ad angolo. Memorizza quante pi\u00f9 posizioni di numeri possibile nel minor tempo (Usa i secondi di GUARDA in modo efficiente).<br>Dopo aver GUARDATO, scopri qui a sinistra il tuo primo bersaglio su sei.",
         p1:"TOCCA & SPINGI", p2:"Il bersaglio a sinistra mostra: <b>{zahl}</b> deve raggiungere <b>{farbe}</b>.<br><b>TOCCA</b> il cubo da una a sei volte.<br><b>SPINGI</b> nella direzione desiderata per attivare il ribaltamento.",
         bs:"BRAIN SCORE", nh:"Nessun colpo, nessun punteggio", st:"{t} COLPI | {z} sec. di GUARDA", bw:"Migliore: 100% | Peggiore: 12%",
-        ma:"GIOCA CON GUIDA", sp:"GIOCARE", dm:"GUARDA DEMO",
+        ma:"GIOCA CON GUIDA", sp:"GIOCARE", dm:"GUARDA DEMO", ss:"giocare da solo",
         d1:["Dopo il clic sull\u2019occhio<br>puoi ribaltare il cubo","con il dito<br>nella scatola."],
         d1b:["Inclinare sul bordo,<br>memorizza le posizioni.","Inclinare sul bordo,<br>memorizza le posizioni.","Il contatore conta<br>i tuoi secondi di GUARDA.","Usa i sec. GUARDA<br>con parsimonia,","peggiorano il tuo<br>BRAIN SCORE."],
         d2:"Clicca per rivelare il BERSAGLIO.",
@@ -637,7 +716,7 @@
         k1:"BAK & HATIRLA", k2:"K\u00fcp\u00fc kutunun i\u00e7inde herhangi bir y\u00f6ne k\u00f6\u015feden k\u00f6\u015feye devir. M\u00fcmk\u00fcn oldu\u011funca \u00e7ok say\u0131 pozisyonunu en k\u0131sa s\u00fcrede ezberle (BAKMA saniyelerini verimli kullan).<br>BAKTIKTAN sonra burada solda alt\u0131 hedefinden ilkini a\u00e7.",
         p1:"DOKUN & \u0130T", p2:"Soldaki hedef g\u00f6steriyor: <b>{zahl}</b> \u2192 <b>{farbe}</b> olmal\u0131.<br>K\u00fcpe <b>bir ile alt\u0131</b> kez <b>DOKUN</b>.<br>Sonra istedi\u011fin y\u00f6ne <b>\u0130T</b> ve devrilmeyi ba\u015flat.",
         bs:"BRAIN SCORE", nh:"\u0130sabet yok, puan yok", st:"{t} \u0130SABET | {z} BAKMA saniyesi", bw:"En iyi: 100% | En k\u00f6t\u00fc: 12%",
-        ma:"REHBERL\u0130 OYNA", sp:"OYNA", dm:"DEMOYU \u0130ZLE",
+        ma:"REHBERL\u0130 OYNA", sp:"OYNA", dm:"DEMOYU \u0130ZLE", ss:"kendin oyna",
         d1:["G\u00f6ze t\u0131klad\u0131ktan sonra<br>k\u00fcp\u00fc parma\u011f\u0131nla","kutuda<br>devrilebilirsin."],
         d1b:["Kenara yat\u0131r,<br>pozisyonlar\u0131 ezberle.","Kenara yat\u0131r,<br>pozisyonlar\u0131 ezberle.","Saya\u00e7 senin<br>BAKMA saniyelerini sayar.","BAKI\u015e saniyelerini<br>az kullan,","BRAIN SCORE\u2019unu<br>k\u00f6t\u00fcle\u015ftirir."],
         d2:"HEDEF\u0130NI a\u00e7mak i\u00e7in t\u0131kla.",
@@ -1309,6 +1388,15 @@
       }
     };
 
+    function refreshFaceSlots() {
+      faceSlots.f1.slotMap = { '0,0': { val: deck[4], rot: Math.PI }, '0,1': { val: deck[5], rot: Math.PI }, '1,2': { val: deck[6], rot: -Math.PI/2 }, '2,2': { val: deck[7], rot: -Math.PI/2 } };
+      faceSlots.f2.slotMap = { '2,2': { val: deck[8], rot: 0 }, '2,1': { val: deck[9], rot: 0 }, '1,0': { val: deck[10], rot: Math.PI/2 }, '0,0': { val: deck[11], rot: Math.PI/2 } };
+      faceSlots.f0.slotMap = { '2,0': { val: deck[0], rot: Math.PI/2 }, '1,0': { val: deck[1], rot: Math.PI/2 }, '0,1': { val: deck[2], rot: Math.PI }, '0,2': { val: deck[3], rot: Math.PI } };
+      rebuildFaceMat('f0', 1);
+      rebuildFaceMat('f1', 1);
+      rebuildFaceMat('f2', 1);
+    }
+
     function rebuildFaceMat(faceKey, alpha) {
       const f = faceSlots[faceKey];
       const newMat = mat(f.slotMap, f.imgRot, alpha);
@@ -1677,7 +1765,7 @@
       
       if (alleMoeglichenKombis.length === 0) return null;
       
-      const idx = Math.floor(Math.random() * alleMoeglichenKombis.length);
+      const idx = Math.floor((autoDemoActive && dRandom ? dRandom() : Math.random()) * alleMoeglichenKombis.length);
       return alleMoeglichenKombis[idx];
     }
 
@@ -2396,20 +2484,41 @@
     // AUTO-DEMO MODULE
     // =========================
     let autoDemoActive = false;
+    let demoSpeed = 1;
+    let dRandom;
+    let originalDeck = null;
+
+    // Demo-only sleep: respects speed, aborts on stop
+    function dSleep(ms) {
+      if (!autoDemoActive) return Promise.resolve();
+      const actual = Math.max(ms / demoSpeed, 16);
+      return new Promise(resolve => setTimeout(resolve, actual));
+    }
+
+    // Seeded PRNG for deterministic demo (mulberry32)
+    function initDemoRandom(seed) {
+      seed = seed || 42;
+      dRandom = function() {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
 
     // === SUBTITLE ENGINE ===
     const subEl = document.getElementById('demoSubtitle');
 
     async function showSubtitle(text, duration) {
       duration = duration || 2000;
-      if (!text || text === '') return await sleep(duration); // skip empty lines
+      if (!text || text === '') return await dSleep(duration);
       subEl.innerHTML = text;
       subEl.style.display = 'block';
       subEl.style.opacity = '1';
-      await sleep(duration);
+      await dSleep(duration);
       if (!autoDemoActive) { subEl.style.opacity = '0'; return; }
       subEl.style.opacity = '0';
-      await sleep(350); // fade out transition time
+      await dSleep(350);
     }
 
     async function showSubtitleSequence(lines, perLine) {
@@ -2508,18 +2617,19 @@
         }
         isAnimating = false;
         kippDirection = dir;
-        await performKipp(direction, 700);
+        await performKipp(direction, Math.max(700 / demoSpeed, 50));
         advanceTopFace();
-        if (i < steps - 1) await sleep(300);
+        if (i < steps - 1) await dSleep(300);
       }
       isAnimating = false;
     }
 
     // === HALF-KIPP WITH WOBBLE ===
     // Realistic "peek at 2 faces" technique: tilt to edge, wobble slowly, then complete
-    async function halfKippWithWobble(direction, wobbleCount, wobblePause) {
+    async function halfKippWithWobble(direction, wobbleCount, wobblePause, speedFactor) {
       wobbleCount = wobbleCount || 3;
-      wobblePause = wobblePause || 0; // extra pause after wobble before completing
+      wobblePause = wobblePause || 0;
+      speedFactor = speedFactor || 1;
 
       // Direction → pivot definitions (same as performKipp)
       const defs = {
@@ -2574,25 +2684,25 @@
       }
 
       // 1) Tilt to half angle (45°) — 600ms, smooth
-      await animAngle(0, halfAngle, 600);
+      await animAngle(0, halfAngle, 600 / speedFactor);
 
       // 2) Wobble: slow oscillation between wobbleMin and wobbleMax
       let currentAnglePos = halfAngle;
       for (let w = 0; w < wobbleCount; w++) {
         const target = (w % 2 === 0) ? wobbleMin : wobbleMax;
-        await animAngle(currentAnglePos, target, 800);
+        await animAngle(currentAnglePos, target, 800 / speedFactor);
         currentAnglePos = target;
       }
       // Return to halfAngle
       if (Math.abs(currentAnglePos - halfAngle) > 0.01) {
-        await animAngle(currentAnglePos, halfAngle, 500);
+        await animAngle(currentAnglePos, halfAngle, 500 / speedFactor);
       }
 
       // Optional extra pause (player is memorizing)
-      if (wobblePause > 0) await sleep(wobblePause);
+      if (wobblePause > 0) await sleep(wobblePause / speedFactor);
 
       // 3) Complete: animate from halfAngle to fullAngle — 500ms
-      await animAngle(halfAngle, fullAngle, 500);
+      await animAngle(halfAngle, fullAngle, 500 / speedFactor);
 
       // --- Finalize: extract cube from pivot ---
       cube.updateMatrixWorld();
@@ -2684,6 +2794,8 @@
     // === MAIN AUTO-DEMO ORCHESTRATOR ===
     async function runAutoDemo() {
       autoDemoActive = true;
+      demoSpeed = 1;
+      initDemoRandom(42);
       gamePhase = 'autoDemo';
 
       // Hide start overlay
@@ -2702,6 +2814,18 @@
       topFace = 'f2';
       kippDirection = 'cw';
       isAnimating = false;
+
+      // Deterministic deck shuffle for identical demo every time
+      const demoOrder = [1,2,3,4,5,6,7,8,9,10,11,12];
+      originalDeck = deck.slice(); // Save original at module level
+      for (let i = demoOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(dRandom() * (i + 1));
+        [demoOrder[i], demoOrder[j]] = [demoOrder[j], demoOrder[i]];
+      }
+      for (let i = 0; i < 12; i++) deck[i] = demoOrder[i];
+
+      // Rebuild face textures with new deck values
+      refreshFaceSlots();
 
       // Reset game state - COMPREHENSIVE
       activeCardIdx = 0;
@@ -2749,6 +2873,9 @@
         timerTopPos = '553px';
       }
 
+      // Show transport controls
+      showTransportBar();
+
       // Hit/Miss pattern: 4 Hits, 2 Misses (realistic good player)
       const hitPattern = [true, true, false, true, true, false];
 
@@ -2771,11 +2898,13 @@
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
 
-      // Calculate and show Brain Score (reuse existing logic)
+      // Calculate and show Brain Score (fixed observation time for deterministic demo)
+      totalObservationTime = 45;
       const treffer = bereitsGetroffen.size;
       const scoreValue = calculateBrainScore(totalObservationTime, treffer);
 
       const brainScore = document.getElementById('brainScore');
+      hideTransportBar();
       if (scoreValue === "No Hit, no Score") {
         brainScore.innerHTML = '<span style="font-size:12pt;font-weight:bold;">' + T.bs + ':<br>' + T.nh + '</span>' +
           '<br><span style="font-size:10pt;font-weight:normal;">' + T.st.replace("{t}",treffer).replace("{z}",totalObservationTime) + '</span>';
@@ -2788,7 +2917,7 @@
       brainScore.style.opacity = '1';
 
       // Show score for 5 seconds, then back to start
-      await sleep(5000);
+      await new Promise(r => setTimeout(r, 4000));
 
       if (!autoDemoActive) return;
       autoDemoActive = false;
@@ -2798,6 +2927,14 @@
       cube.quaternion.set(0, 0, 0, 1);
       currentQuadrant = 3;
       topFace = 'f2';
+
+      // Restore original deck
+      if (originalDeck) {
+        for (let i = 0; i < 12; i++) deck[i] = originalDeck[i];
+        refreshFaceSlots();
+        originalDeck = null;
+      }
+
       backToStartScreen();
     }
 
@@ -2830,7 +2967,7 @@
       countdown.style.display = 'none';
 
       // Subtitle: explain eye (1.5s pause first to let user settle)
-      await sleep(1500);
+      await dSleep(1500);
       if (!autoDemoActive) return;
       await showSubtitleSequence(T.d1, 2500);
       if (!autoDemoActive) return;
@@ -2847,7 +2984,7 @@
       countdown.style.top = (parseInt(timerTopPos) + 45) + 'px';
       countdown.style.left = '180px';
 
-      await sleep(400);
+      await dSleep(400);
       if (!autoDemoActive) return;
 
       // Start counter on first movement
@@ -2860,28 +2997,28 @@
         for (let hw = 0; hw < 3; hw++) {
           const wobbles = 3 - hw;
           const pause = (hw < 2) ? 300 : 100;
-          await halfKippWithWobble(nextCwDir(), wobbles, pause);
+          await halfKippWithWobble(nextCwDir(), wobbles, pause, demoSpeed);
           if (!autoDemoActive) return;
-          if (hw < 2) await sleep(200);
+          if (hw < 2) await dSleep(200);
         }
 
         // Random extra move
-        const extraOption = Math.floor(Math.random() * 4);
+        const extraOption = Math.floor(dRandom() * 4);
         if (extraOption === 1) {
           kippDirection = 'ccw';
-          await sleep(300);
-          await halfKippWithWobble(nextCcwDir(), 2, 100);
+          await dSleep(300);
+          await halfKippWithWobble(nextCcwDir(), 2, 100, demoSpeed);
         } else if (extraOption === 2) {
           kippDirection = 'cw';
-          await sleep(300);
-          await halfKippWithWobble(nextCwDir(), 2, 100);
+          await dSleep(300);
+          await halfKippWithWobble(nextCwDir(), 2, 100, demoSpeed);
         } else if (extraOption === 3) {
           kippDirection = 'ccw';
-          await sleep(300);
-          await halfKippWithWobble(nextCcwDir(), 2, 200);
+          await dSleep(300);
+          await halfKippWithWobble(nextCcwDir(), 2, 200, demoSpeed);
           if (!autoDemoActive) return;
-          await sleep(200);
-          await halfKippWithWobble(nextCcwDir(), 1, 0);
+          await dSleep(200);
+          await halfKippWithWobble(nextCcwDir(), 1, 0, demoSpeed);
         }
       }
 
@@ -2895,7 +3032,7 @@
       // ==========================================
       // 3) PAUSE after SCHAUEN — counter keeps running
       // ==========================================
-      await sleep(2000);
+      await dSleep(2000);
       if (!autoDemoActive) return;
 
       // Stop counter
@@ -2958,7 +3095,7 @@
       const farbDisplay = { violett: T.fV, blau: T.fB, gruen: T.fG, orange: T.fO };
       const d3Lines = T.d3.map(l => l.replace('{z}', kz.zahl).replace('{f}', (farbDisplay[kz.color.name] || kz.color.name)));
 
-      await sleep(1500);
+      await dSleep(1500);
       if (!autoDemoActive) return;
       await showSubtitle(d3Lines[0], 4000);
       if (!autoDemoActive) return;
@@ -3007,12 +3144,12 @@
           cube.material.forEach(m => { m.emissive.setHex(origEmissive); });
         }, 150);
 
-        await sleep(1000);
+        await dSleep(1000);
         if (!autoDemoActive) return;
       }
 
       // 1.3 sec after last tap → execute
-      await sleep(1300);
+      await dSleep(1300);
 
       // Hide target + indicators, execute kipps
       kippTargetEl.style.display = 'none';
@@ -3026,7 +3163,7 @@
       if (!autoDemoActive) return;
 
       // 2 sec wait → show result
-      await sleep(2000);
+      await dSleep(2000);
 
       autoDemoShowResult(shouldHit);
       if (shouldHit) {
@@ -3034,12 +3171,92 @@
       }
 
       // 2 sec with result visible
-      await sleep(2000);
+      await dSleep(2000);
       if (!autoDemoActive) return;
 
       // Transfer to gameCard
       autoDemoTransferToCard(roundIdx);
     }
+
+    // =========================
+    // TRANSPORT BAR (Demo Speed)
+    // =========================
+    const transportBar = document.getElementById('transportBar');
+    let arrowLevel = 0; // 0=normal, 1=2x, 2=4x, 3=8x
+
+    function updateArrowDisplay() {
+      const a1 = document.getElementById('arrow1');
+      const a2 = document.getElementById('arrow2');
+      const a3 = document.getElementById('arrow3');
+      const skip = document.getElementById('btnSkipEnd');
+      // Reset all
+      a1.className = 'speedArrow'; a1.style.display = 'block'; a1.style.opacity = '0.45';
+      a2.className = 'speedArrow'; a2.style.display = 'none';
+      a3.className = 'speedArrow'; a3.style.display = 'none';
+      skip.className = '';
+      if (arrowLevel >= 1) { a1.classList.add('active'); }
+      if (arrowLevel >= 2) { a2.style.display = 'block'; a2.classList.add('active'); }
+      if (arrowLevel >= 3) { a3.style.display = 'block'; a3.classList.add('active'); }
+      if (demoSpeed >= 20) { skip.classList.add('active'); }
+    }
+
+    function showTransportBar() {
+      const top = parseInt(timerTopPos || '553') + 45;
+      transportBar.style.top = top + 'px';
+      transportBar.style.display = 'block';
+      demoSpeed = 1;
+      arrowLevel = 0;
+      updateArrowDisplay();
+      const T = TRANSLATIONS[currentLang] || TRANSLATIONS['de'];
+      document.getElementById('btnSelbstSpielen').textContent = T.ss || 'selber spielen';
+    }
+
+    function hideTransportBar() {
+      transportBar.style.display = 'none';
+      demoSpeed = 1;
+      arrowLevel = 0;
+    }
+
+    // Speed arrows: cycle 0→1→2→3→0
+    document.getElementById('speedArrows').addEventListener('click', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      if (!autoDemoActive) return;
+      arrowLevel = (arrowLevel >= 3) ? 0 : arrowLevel + 1;
+      demoSpeed = [1, 2, 4, 8][arrowLevel];
+      updateArrowDisplay();
+    });
+
+    // Skip to end
+    document.getElementById('btnSkipEnd').addEventListener('click', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      if (!autoDemoActive) return;
+      demoSpeed = 20;
+      arrowLevel = 0;
+      updateArrowDisplay();
+    });
+
+    // Selber spielen → go to SPIELEN mode
+    document.getElementById('btnSelbstSpielen').addEventListener('click', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      autoDemoActive = false;
+      hideTransportBar();
+      // Restore original deck
+      if (originalDeck) {
+        for (let i = 0; i < 12; i++) deck[i] = originalDeck[i];
+        refreshFaceSlots();
+        originalDeck = null;
+      }
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      cube.quaternion.set(0, 0, 0, 1);
+      currentQuadrant = 3;
+      topFace = 'f2';
+      backToStartScreen();
+      setTimeout(() => {
+        document.getElementById('startOverlay').style.display = 'none';
+        isReplay = true;
+        initSpielzielPhase();
+      }, 100);
+    });
 
     // =========================
     // BUTTON EVENT LISTENERS
@@ -3071,6 +3288,7 @@
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
       hideSubtitle();
+      hideTransportBar();
       verdecktesMesh.visible = false;
       // Alle Kärtchen ausblenden
       gameCards.forEach(c => c.mesh.visible = false);
@@ -3797,6 +4015,12 @@
       
       // Abort auto-demo if active
       autoDemoActive = false;
+      hideTransportBar();
+      if (originalDeck) {
+        for (let i = 0; i < 12; i++) deck[i] = originalDeck[i];
+        refreshFaceSlots();
+        originalDeck = null;
+      }
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
