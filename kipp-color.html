@@ -652,7 +652,7 @@
         fV:"Mor", fB:"Mavi", fG:"Ye\u015fil", fO:"Turuncu"
       }
     }[_digikippLang];
-    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",dc1:"Weiter mit der Demo?<br>Dann Klick aufs Auge.",dc2:"Selber spielen?<br>Dann Pfeil oben links.",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
+    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
     document.getElementById("btnSpielen").textContent = T.sp;
     document.getElementById("btnDemo").textContent = T.dm;
 
@@ -2768,44 +2768,26 @@
         await autoDemoRound(round, hitPattern[round]);
         if (!autoDemoActive) return;
 
-        // === INTER-ROUND PAUSE: Eye + cycling subtitles ===
-        // Show eye icon (pulsing)
-        const eyeIconPause = document.getElementById('eyeIcon');
-        eyeIconPause.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
-        eyeIconPause.style.display = 'block';
-
-        // Start cycling dc1/dc2 subtitles (switch every 3s with fade)
-        let cycleIdx = 0;
-        const cycleTexts = [T.dc1, T.dc2];
-        subEl.innerHTML = cycleTexts[0];
+        // Inter-round pause: eye pulsiert, Untertitel wechseln
+        const eyePause = document.getElementById('eyeIcon');
+        eyePause.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
+        eyePause.style.display = 'block';
+        let ci = 0;
+        const ct = [T.dc1, T.dc2];
+        subEl.innerHTML = ct[0];
         subEl.style.display = 'block';
         subEl.style.opacity = '1';
         demoCycleInterval = setInterval(() => {
-          cycleIdx = (cycleIdx + 1) % 2;
+          ci = (ci + 1) % 2;
           subEl.style.opacity = '0';
-          setTimeout(() => {
-            if (!demoCycleInterval) return;
-            subEl.innerHTML = cycleTexts[cycleIdx];
-            subEl.style.opacity = '1';
-          }, 350);
+          setTimeout(() => { if (demoCycleInterval) { subEl.innerHTML = ct[ci]; subEl.style.opacity = '1'; } }, 350);
         }, 3000);
-
-        // Wait for user: eye click → 'continue', back arrow → 'play'
-        const userChoice = await new Promise(resolve => {
-          demoPauseResolve = resolve;
-        });
-
-        // Cleanup
+        const choice = await new Promise(r => { demoPauseResolve = r; });
         if (demoCycleInterval) { clearInterval(demoCycleInterval); demoCycleInterval = null; }
         hideSubtitle();
-        eyeIconPause.style.display = 'none';
+        eyePause.style.display = 'none';
         demoPauseResolve = null;
-
-        if (userChoice === 'play' || !autoDemoActive) {
-          // User chose to play → exit demo loop
-          return;
-        }
-        // userChoice === 'continue' → next round
+        if (choice === 'play' || !autoDemoActive) return;
       }
 
       // ==========================================
@@ -3108,8 +3090,6 @@
     
     // Zurück zur Startseite (resetButton in Start/Spielziel-Phase)
     function backToStartScreen() {
-      if (demoCycleInterval) { clearInterval(demoCycleInterval); demoCycleInterval = null; }
-      if (demoPauseResolve) { demoPauseResolve('abort'); demoPauseResolve = null; }
       document.getElementById('spielZielText').style.display = 'none';
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
@@ -3201,10 +3181,7 @@
     eyeEl.addEventListener('touchend', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (gamePhase === 'autoDemo' && demoPauseResolve) {
-        demoPauseResolve('continue');
-        return;
-      }
+      if (gamePhase === 'autoDemo' && demoPauseResolve) { demoPauseResolve('continue'); return; }
       if (gamePhase !== 'entscheidung') return;
       if (activeCardIdx === 0 && !isReplay) {
         spielzielToDemoPhase();
@@ -3214,10 +3191,7 @@
     }, { passive: false });
     eyeEl.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (gamePhase === 'autoDemo' && demoPauseResolve) {
-        demoPauseResolve('continue');
-        return;
-      }
+      if (gamePhase === 'autoDemo' && demoPauseResolve) { demoPauseResolve('continue'); return; }
       if (gamePhase !== 'entscheidung') return;
       if (activeCardIdx === 0 && !isReplay) {
         spielzielToDemoPhase();
@@ -3847,21 +3821,19 @@
     // - In allen anderen Phasen → Reset + zurück zum Start-Overlay
     resetButton.addEventListener('click', () => {
       if (gamePhase === 'start') {
+        // Auf Start-Overlay → zurück zum Hauptmenü
         window.location.href = 'index.html';
         return;
       }
       
-      // During autoDemo pause → start game (like SPIELEN button)
+      // During demo pause → start real game
       if (gamePhase === 'autoDemo' && demoPauseResolve) {
         autoDemoActive = false;
         if (demoCycleInterval) { clearInterval(demoCycleInterval); demoCycleInterval = null; }
         hideSubtitle();
         demoPauseResolve('play');
         demoPauseResolve = null;
-        
-        // Clean up demo state
         stopCountdown();
-        if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
         isDemoAnimating = false;
         handDemo.visible = false;
         document.getElementById('eyeIcon').style.display = 'none';
@@ -3873,35 +3845,22 @@
         tapIndicatorB.mesh.visible = false;
         verdecktesMesh.visible = false;
         gameCards.forEach(c => c.mesh.visible = false);
-        
-        // Reset cube to start
         cube.position.set(-offset, offset, 0.109375 + offset);
         cube.quaternion.set(0, 0, 0, 1);
-        currentQuadrant = 3;
-        topFace = 'f2';
-        kippCount = 0;
-        lockedKippDir = null;
-        currentDragDir = null;
-        erstesKippziel = null;
-        kippzielChecked = false;
-        totalObservationTime = 0;
-        tapCount = 0;
-        activeCardIdx = 0;
-        bereitsGetroffen.clear();
-        bereitsAusgegeben.clear();
+        currentQuadrant = 3; topFace = 'f2';
+        kippCount = 0; lockedKippDir = null; currentDragDir = null;
+        erstesKippziel = null; kippzielChecked = false;
+        totalObservationTime = 0; tapCount = 0; activeCardIdx = 0;
+        bereitsGetroffen.clear(); bereitsAusgegeben.clear();
         offeneKippzieleVergeben = 0;
         openKippzielPositions = pickTwoRandomPositions();
-        
         isReplay = true;
-        gamePhase = 'spielziel';
         initSpielzielPhase();
         return;
       }
       
       // Abort auto-demo if active
       autoDemoActive = false;
-      if (demoCycleInterval) { clearInterval(demoCycleInterval); demoCycleInterval = null; }
-      if (demoPauseResolve) { demoPauseResolve('abort'); demoPauseResolve = null; }
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
