@@ -2825,7 +2825,7 @@
       // 1) SHOW EYE ONLY + subtitle sequence
       // ==========================================
       const eyeIcon = document.getElementById('eyeIcon');
-      eyeIcon.style.top = (parseInt(timerTopPos || '553') + 20) + 'px';
+      eyeIcon.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
       eyeIcon.style.display = 'block';
       countdown.style.display = 'none';
 
@@ -3128,7 +3128,7 @@
       const vkPos = new THREE.Vector3().copy(verdecktesMesh.position);
       vkPos.project(camera);
       const vkScreenY = (-vkPos.y * 0.5 + 0.5) * 720;
-      eyeIcon.style.top = (parseInt(timerTopPos || '553') + 20) + 'px'; // 55px unter Kippziel-Mitte
+      eyeIcon.style.top = (parseInt(timerTopPos || '553') + 26) + 'px'; // 55px unter Kippziel-Mitte
       eyeIcon.style.display = 'block';
       
       // Entscheidungs-Text nur beim ersten Mal zeigen
