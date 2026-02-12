@@ -2960,7 +2960,11 @@
 
       await sleep(1500);
       if (!autoDemoActive) return;
-      await showSubtitleSequence(d3Lines, 2500);
+      await showSubtitle(d3Lines[0], 4000);
+      if (!autoDemoActive) return;
+      await showSubtitle(d3Lines[1], 4500);
+      if (!autoDemoActive) return;
+      await showSubtitle(d3Lines[2], 4500);
       if (!autoDemoActive) return;
       hideSubtitle();
 
