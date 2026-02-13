@@ -2859,9 +2859,10 @@
       await showSubtitle(T.d5b, 3000);
       if (!autoDemoActive) return;
 
-      // Show eye icon + joker icons row during d5c
+      // Show eye icon (no pulse) + joker icons row during d5c
       const eyeIconEl = document.getElementById('eyeIcon');
       eyeIconEl.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
+      eyeIconEl.style.animation = 'none';
       eyeIconEl.style.display = 'block';
 
       // Position joker row below verdecktesMesh (cards area)
@@ -2877,24 +2878,11 @@
       await showSubtitle(T.d5c, 4000);
       if (!autoDemoActive) return;
 
-      // Hide eye + joker icons
-      eyeIconEl.style.display = 'none';
-      jokerRow.style.opacity = '0';
-      setTimeout(() => { jokerRow.style.display = 'none'; }, 350);
+      // Keep eye + joker icons visible for user to explore
       hideSubtitle();
 
-      // Wait, then back to start
-      await sleep(2000);
-
-      if (!autoDemoActive) return;
+      // Stay here — user can reset via button or interact with icons
       autoDemoActive = false;
-
-      // Cube zurück auf Start
-      cube.position.set(-offset, offset, 0.109375 + offset);
-      cube.quaternion.set(0, 0, 0, 1);
-      currentQuadrant = 3;
-      topFace = 'f2';
-      backToStartScreen();
     }
 
     // === Single demo round ===
@@ -2923,6 +2911,7 @@
       // ==========================================
       const eyeIcon = document.getElementById('eyeIcon');
       eyeIcon.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
+      eyeIcon.style.animation = '';
       eyeIcon.style.display = 'block';
       countdown.style.display = 'none';
 
@@ -3249,6 +3238,7 @@
       vkPos.project(camera);
       const vkScreenY = (-vkPos.y * 0.5 + 0.5) * 720;
       eyeIcon.style.top = (parseInt(timerTopPos || '553') + 26) + 'px'; // 55px unter Kippziel-Mitte
+      eyeIcon.style.animation = '';
       eyeIcon.style.display = 'block';
       
       // Entscheidungs-Text nur beim ersten Mal zeigen
@@ -3828,6 +3818,7 @@
       
       // Auge an fester Position einblenden (zentriert, pulsierend)
       const eyeIcon = document.getElementById('eyeIcon');
+      eyeIcon.style.animation = '';
       eyeIcon.style.display = 'block';
       
       // Timer ausblenden
