@@ -164,33 +164,6 @@
       0%, 100% { transform: translateX(-50%) scale(1); filter: drop-shadow(0 2px 6px rgba(255,255,255,0.4)); }
       50% { transform: translateX(-50%) scale(1.12); filter: drop-shadow(0 2px 12px rgba(255,255,255,0.7)); }
     }
-    #kippTarget {
-      position: absolute;
-      width: 21px;
-      height: 21px;
-      border: 3px solid #4a2a10;
-      border-radius: 50%;
-      pointer-events: none;
-      display: none;
-      z-index: 120;
-      transform: translate(-50%, -50%);
-      animation: targetPulse 1.5s ease-in-out infinite;
-    }
-    #kippTarget::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 6px;
-      height: 6px;
-      background: #4a2a10;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-    @keyframes targetPulse {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
-      50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.5; }
-    }
     #entscheidungText {
       position: absolute;
       top: 421px;
@@ -570,7 +543,7 @@
     <div id="tutorialText"></div>
     <div id="spielZielText"></div>
     <div id="entscheidungText"></div>
-    <div id="kippTarget"></div>
+
     <div id="brainScore"></div>
     <div id="countdown">60</div>
     <div id="demoSubtitle"></div>
@@ -1610,11 +1583,7 @@
     };
 
     function updateKippTargetPosition() {
-      const pos3D = KIPP_TARGET_POS_3D[currentQuadrant].clone();
-      pos3D.project(camera);
-      const targetEl = document.getElementById('kippTarget');
-      targetEl.style.left = ((pos3D.x * 0.5 + 0.5) * 360) + 'px';
-      targetEl.style.top = ((-pos3D.y * 0.5 + 0.5) * 720) + 'px';
+      // [kippTarget removed]
     }
 
     // 4 Farbfelder pro Quadrant (für Nicht-Treffer-Animation)
@@ -1833,8 +1802,8 @@
     function calculateBrainScore(observationTime, hits) {
       // Constants
       const FREE_TIME = 20;
-      const MAX_TIME = 120;
-      const EXTRA_TIME_RANGE = 100; // MAX_TIME - FREE_TIME
+      const MAX_TIME = 30;
+      const EXTRA_TIME_RANGE = 10; // MAX_TIME - FREE_TIME
       const k = 1.0;
       const c = 2.5976583;
       
@@ -1872,7 +1841,7 @@
       setButtonsDisabled(true);
       document.getElementById('richtungButtons').classList.add('hidden');
       kippButtons.classList.add('hidden');
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
@@ -1921,7 +1890,7 @@
     function startPausePhase() {
       gamePhase = 'pause';
       pauseExiting = false;
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
 
       // Aktuelle opacity aller 6 Kärtchen speichern
       savedCardOpacities.length = 0;
@@ -2844,7 +2813,7 @@
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
       document.getElementById('eyeIcon').style.display = 'none';
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       document.getElementById('brainScore').style.display = 'none';
       jokerRow.style.display = 'none'; jokerRow.style.opacity = '0';
       actionButton.style.display = 'none';
@@ -2879,7 +2848,7 @@
       // ==========================================
       console.log('=== Showing d5 subtitles ===');
       dbg('Tutorial done, showing d5 sequence');
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
 
@@ -2981,7 +2950,7 @@
       if (!autoDemoActive) return;
 
       // Start counter on first movement
-      startCountdown(null, 120);
+      startCountdown(null, 30);
       countdown.style.top = (parseInt(timerTopPos) + 45) + 'px'; // demo offset
 
       // WOBBLES + d1b SUBTITLES run in parallel
@@ -3027,19 +2996,19 @@
 
         // Last d1b line: "Früher abbrechen? Auf Würfel tippen."
         // Simultaneously show kippTarget
-        const kippTargetEl = document.getElementById('kippTarget');
+        const kippTargetEl = null; // [kippTarget removed]
         updateKippTargetPosition();
-        kippTargetEl.style.width = '21px';
-        kippTargetEl.style.height = '21px';
-        kippTargetEl.style.animation = 'targetPulse 1.5s ease-in-out infinite';
-        kippTargetEl.style.display = 'block';
+        // [kippTarget removed] kippTargetEl.style.width = '21px';
+        // [kippTarget removed] kippTargetEl.style.height = '21px';
+        // [kippTarget removed] kippTargetEl.style.animation = 'targetPulse 1.5s ease-in-out infinite';
+        // [kippTarget removed] kippTargetEl.style.display = 'block';
 
         await showSubtitle(T.d1b[T.d1b.length - 1], 3500);
         if (!autoDemoActive) return;
 
         // Hide kippTarget after subtitle fades
-        kippTargetEl.style.display = 'none';
-        kippTargetEl.style.animation = '';
+        // [kippTarget removed] kippTargetEl.style.display = 'none';
+        // [kippTarget removed] kippTargetEl.style.animation = '';
       }
 
       await Promise.all([
@@ -3096,12 +3065,12 @@
       // ==========================================
       // 6) Show target circle + indicators (empty) immediately
       // ==========================================
-      const kippTargetEl = document.getElementById('kippTarget');
+      const kippTargetEl = null; // [kippTarget removed]
       updateKippTargetPosition();
-      kippTargetEl.style.width = '21px';
-      kippTargetEl.style.height = '21px';
-      kippTargetEl.style.animation = '';
-      kippTargetEl.style.display = 'block';
+      // [kippTarget removed] kippTargetEl.style.width = '21px';
+      // [kippTarget removed] kippTargetEl.style.height = '21px';
+      // [kippTarget removed] kippTargetEl.style.animation = '';
+      // [kippTarget removed] kippTargetEl.style.display = 'block';
 
       // Show indicator circles in adjacent quadrants (without numbers)
       tapCount = 0;
@@ -3148,15 +3117,15 @@
 
       // TAP sequence: 1 per second, circle grows, cube flashes
       const baseSize = 14;
-      kippTargetEl.style.animation = 'none';
+      // [kippTarget removed] kippTargetEl.style.animation = 'none';
       tapCount = 0;
       for (let i = 1; i <= execSteps; i++) {
         tapCount = i;
         updateTapIndicators();
 
         const newSize = baseSize + i * 7;
-        kippTargetEl.style.width = newSize + 'px';
-        kippTargetEl.style.height = newSize + 'px';
+        // [kippTarget removed] kippTargetEl.style.width = newSize + 'px';
+        // [kippTarget removed] kippTargetEl.style.height = newSize + 'px';
 
         // Flash cube
         const origEmissive = cube.material[2].emissive.getHex();
@@ -3173,10 +3142,10 @@
       await sleep(1300);
 
       // Hide target + indicators, execute kipps
-      kippTargetEl.style.display = 'none';
-      kippTargetEl.style.animation = '';
-      kippTargetEl.style.width = '21px';
-      kippTargetEl.style.height = '21px';
+      // [kippTarget removed] kippTargetEl.style.display = 'none';
+      // [kippTarget removed] kippTargetEl.style.animation = '';
+      // [kippTarget removed] kippTargetEl.style.width = '21px';
+      // [kippTarget removed] kippTargetEl.style.height = '21px';
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
 
@@ -3227,7 +3196,7 @@
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
       document.getElementById('eyeIcon').style.display = 'none';
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       document.getElementById('brainScore').style.display = 'none';
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
@@ -3259,7 +3228,7 @@
       actionButton.style.display = 'none';
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       
       // Reset-Button zeigen (1/2 A|B positioniert)
       positionResetButton();
@@ -3405,9 +3374,7 @@
       }
       
       // Zielscheibe positionieren basierend auf aktuellem Quadranten
-      updateKippTargetPosition();
-      const targetEl = document.getElementById('kippTarget');
-      targetEl.style.display = 'block';
+      // [kippTarget removed]
       
       // Kein Timer-Display in Spielphase
       stopCountdown();
@@ -3508,7 +3475,7 @@
       
       // Zielscheibe positionieren und anzeigen
       updateKippTargetPosition();
-      document.getElementById('kippTarget').style.display = 'block';
+      // [kippTarget removed]
       
       // Timer aus
       stopCountdown();
@@ -3826,7 +3793,7 @@
       // 5. Spielende?
       if (activeCardIdx >= 6) {
         verdecktesMesh.visible = false;
-        document.getElementById('kippTarget').style.display = 'none';
+        // [kippTarget removed]
         showGameEnd();
         return;
       }
@@ -3844,7 +3811,7 @@
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       tapCount = 0;
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
@@ -3893,7 +3860,7 @@
         if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
           revealVerdecktesKippziel();
         }
-      }, 60);
+      }, 30);
       
       // Würfel bleibt wo er ist - KEIN Reset!
     }
@@ -3921,7 +3888,7 @@
           gamePhase = 'kippen';
           revealVerdecktesKippziel();
         }
-      }, 60);
+      }, 30);
       verdecktesMesh.visible = true;
       verdecktesMesh.userData.revealed = false;
       verdecktesMesh.scale.set(1, 1, 1);
@@ -4150,7 +4117,7 @@
           if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
             revealVerdecktesKippziel();
           }
-        }, 60);
+        }, 30);
         
         // ALLE State-Variablen sauber resetten
         cube.quaternion.set(0, 0, 0, 1); // Reset zu neutraler Rotation
@@ -4325,7 +4292,7 @@
       document.getElementById('richtungButtons').classList.add('hidden');
       kippButtons.classList.add('hidden');
       updateKippTargetPosition();
-      document.getElementById('kippTarget').style.display = 'block';
+      // [kippTarget removed]
 
       // Pause-Lichter aus
       pauseLights.forEach(l => l.visible = false);
@@ -4627,7 +4594,7 @@
       
       // Tap-Counter und Zielkreis ausblenden
       tapIndicatorA.mesh.visible = false; tapIndicatorB.mesh.visible = false;
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
       
       for (let i = 0; i < steps; i++) {
         let direction;
@@ -4785,7 +4752,7 @@
       updateRichtungButtons();
 
       // Zielkreis ausblenden während Kipp-Animation
-      document.getElementById('kippTarget').style.display = 'none';
+      // [kippTarget removed]
 
       // Kärtchen auf Original zurücksetzen - Image neu zeichnen
       const card = gameCards[activeCardIdx];
