@@ -87,6 +87,26 @@
       display: none;
     }
 
+    #auswertungBtn {
+      position: absolute;
+      display: none;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 49px;
+      background: url('button_kurz.webp') center/contain no-repeat;
+      border: none;
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 150;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      color: #e0d0b8;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    }
+
     #countdown {
       position: absolute;
       top: 475px;
@@ -193,7 +213,7 @@
     }
     #skipEndBtn {
       position: absolute;
-      top: 487px;
+      top: 499px;
       left: 12px;
       width: 45px;
       height: 45px;
@@ -583,6 +603,7 @@
     <div id="entscheidungText"></div>
     <div id="kippTarget"></div>
     <div id="brainScore"></div>
+    <button id="auswertungBtn">AUSWERTUNG</button>
     <div id="countdown">60</div>
     <div id="demoSubtitle"></div>
     <div id="jokerIconsRow"></div>
@@ -609,29 +630,15 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    // === GLOBAL ERROR HANDLER + VISIBLE DEBUG ===
-    const _dbg = [];
-    function dbg(msg) { _dbg.push(msg); console.log('[DBG]', msg); updateDbgOverlay(); }
-    function updateDbgOverlay() {
-      let el = document.getElementById('_debugOverlay');
-      if (!el) {
-        el = document.createElement('div');
-        el.id = '_debugOverlay';
-        el.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:60px;overflow-y:auto;background:rgba(0,0,0,0.85);color:#0f0;font:9px monospace;padding:2px 4px;z-index:99999;pointer-events:auto;';
-        document.body.appendChild(el);
-      }
-      el.innerHTML = _dbg.slice(-12).join('<br>');
-      el.scrollTop = el.scrollHeight;
-    }
+    // === GLOBAL ERROR HANDLER (console only) ===
+    function dbg(msg) { console.log('[DBG]', msg); }
     window.onerror = function(msg, url, line, col, error) {
-      dbg('<span style="color:red">ERROR L' + line + ': ' + msg + '</span>');
+      console.error('ERROR L' + line + ': ' + msg);
       return false;
     };
     window.addEventListener('unhandledrejection', function(e) {
-      dbg('<span style="color:red">PROMISE: ' + (e.reason && e.reason.message || e.reason) + '</span>');
+      console.error('PROMISE: ' + (e.reason && e.reason.message || e.reason));
     });
-    dbg('Script start');
-    dbg('THREE.js: ' + (typeof THREE !== 'undefined' ? 'OK r' + THREE.REVISION : 'MISSING'));
 
     // === SPRACH-SYSTEM ===
     var _digikippLang = "de";
@@ -650,7 +657,7 @@
         d2:"Klick dir dein KIPP ZIEL.",
         d3:["Das Kippziel zeigt:<br>{z} muss zu {f}.","TIPPE 1 bis 6 mal<br>auf den W\u00fcrfel.","SCHUBSE ihn anschlie\u00dfend<br>in eine beliebige Richtung."],
         d4h:"GETROFFEN!", d4m:"KNAPP DANEBEN!",
-        d5a:"Tutorial wiederholen?<br>Oder die sechs", d5b:"KIPP-KNIFF-JOKER<br>kennenlernen?", d5c:"Klick aufs Auge<br>oder auf ein KIPP-KNIFF-Icon.",
+        d5a:"Tutorial wiederholen?<br>Oder die sechs", d5b:"KIPP-KNIFF-JOKER<br>kennenlernen?", d5c:"Klick auf Beginn-Button,<br>unten links.",
         fV:"Violett", fB:"Blau", fG:"Gr\u00fcn", fO:"Orange"
       },
       "en": {
@@ -666,7 +673,7 @@
         d2:"Click to reveal your TARGET.",
         d3:["The target shows:<br>{z} must reach {f}.","TAP the cube<br>1 to 6 times.","Then PUSH it<br>in any direction."],
         d4h:"HIT!", d4m:"JUST MISSED!",
-        d5a:"Repeat tutorial?<br>Or discover the six", d5b:"TILT-TRICK JOKERS?", d5c:"Click the eye<br>or a TILT-TRICK icon.",
+        d5a:"Repeat tutorial?<br>Or discover the six", d5b:"TILT-TRICK JOKERS?", d5c:"Click the Start button,<br>bottom left.",
         fV:"Violet", fB:"Blue", fG:"Green", fO:"Orange"
       },
       "es": {
@@ -682,7 +689,7 @@
         d2:"Pulsa para ver tu OBJETIVO.",
         d3:["El objetivo muestra:<br>{z} debe llegar a {f}.","TOCA el cubo<br>de 1 a 6 veces.","Luego EMP\u00daJALO<br>en cualquier direcci\u00f3n."],
         d4h:"\u00a1ACERTADO!", d4m:"\u00a1POR POCO!",
-        d5a:"\u00bfRepetir tutorial?<br>O conocer los seis", d5b:"JOKERS DE<br>TRUCO DE VUELCO?", d5c:"Pulsa el ojo<br>o un icono TRUCO DE VUELCO.",
+        d5a:"\u00bfRepetir tutorial?<br>O conocer los seis", d5b:"JOKERS DE<br>TRUCO DE VUELCO?", d5c:"Pulsa el botón Inicio,<br>abajo a la izquierda.",
         fV:"Violeta", fB:"Azul", fG:"Verde", fO:"Naranja"
       },
       "fr": {
@@ -698,7 +705,7 @@
         d2:"Clique pour r\u00e9v\u00e9ler ta CIBLE.",
         d3:["La cible indique :<br>{z} doit atteindre {f}.","TAPE 1 \u00e0 6 fois<br>sur le cube.","Puis POUSSE-le<br>dans n\u2019importe quelle direction."],
         d4h:"TOUCH\u00c9 !", d4m:"TOUT PR\u00c8S !",
-        d5a:"R\u00e9p\u00e9ter le tutorial ?<br>Ou d\u00e9couvrir les six", d5b:"JOKERS DE<br>TRUC DE BASCULE ?", d5c:"Clique sur l\u2019\u0153il<br>ou sur une ic\u00f4ne TRUC DE BASCULE.",
+        d5a:"R\u00e9p\u00e9ter le tutorial ?<br>Ou d\u00e9couvrir les six", d5b:"JOKERS DE<br>TRUC DE BASCULE ?", d5c:"Clique sur le bouton Début,<br>en bas à gauche.",
         fV:"Violet", fB:"Bleu", fG:"Vert", fO:"Orange"
       },
       "it": {
@@ -714,7 +721,7 @@
         d2:"Clicca per rivelare il BERSAGLIO.",
         d3:["Il bersaglio mostra:<br>{z} deve raggiungere {f}.","TOCCA il cubo<br>da 1 a 6 volte.","Poi SPINGI<br>in qualsiasi direzione."],
         d4h:"COLPITO!", d4m:"QUASI PRESO!",
-        d5a:"Ripetere il tutorial?<br>O scoprire i sei", d5b:"JOKER DI<br>TRUCCO DI RIBALTAMENTO?", d5c:"Clicca sull\u2019occhio<br>o su un\u2019icona TRUCCO DI RIBALTAMENTO.",
+        d5a:"Ripetere il tutorial?<br>O scoprire i sei", d5b:"JOKER DI<br>TRUCCO DI RIBALTAMENTO?", d5c:"Clicca sul pulsante Inizio,<br>in basso a sinistra.",
         fV:"Viola", fB:"Blu", fG:"Verde", fO:"Arancione"
       },
       "tr": {
@@ -730,11 +737,11 @@
         d2:"HEDEF\u0130NI a\u00e7mak i\u00e7in t\u0131kla.",
         d3:["Hedef g\u00f6steriyor:<br>{z}, {f} olmal\u0131.","K\u00fcpe 1\u20136 kez<br>DOKUN.","Sonra \u0130T<br>herhangi bir y\u00f6ne."],
         d4h:"\u0130SABET!", d4m:"AZ KALDI!",
-        d5a:"Tutorial\u0131 tekrarla?<br>Veya alt\u0131", d5b:"DEVIRME-TRICK<br>JOKER\u0130 ke\u015ffet?", d5c:"G\u00f6ze t\u0131kla<br>veya bir DEVIRME-TRICK ikonuna.",
+        d5a:"Tutorial\u0131 tekrarla?<br>Veya alt\u0131", d5b:"DEVIRME-TRICK<br>JOKER\u0130 ke\u015ffet?", d5c:"Sol alttaki Başla butonuna<br>tıkla.",
         fV:"Mor", fB:"Mavi", fG:"Ye\u015fil", fO:"Turuncu"
       }
     }[_digikippLang];
-    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",dm:"TUTORIAL",d5a:"Tutorial wiederholen?<br>Oder die sechs",d5b:"KIPP-KNIFF-JOKER<br>kennenlernen?",d5c:"Klick aufs Auge<br>oder auf ein KIPP-KNIFF-Icon.",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
+    if(!T) T = {s1:"SPIEL ZIEL",s2:"",w:"weiter",n:"Neues Spiel",e1:"IMMER 2 OPTIONEN",e2:"",e3:"",k1:"SCHAUEN & MERKEN",k2:"",p1:"TIPPEN & SCHUBSEN",p2:"",bs:"BRAIN SCORE",nh:"No Hit, no Score",st:"{t} HITS | {z} SCHAU-Sekunden",bw:"Best: 100% | Worst: 12%",ma:"SPIEL MIT ANLEITUNG",sp:"SPIELEN",dm:"TUTORIAL",d5a:"Tutorial wiederholen?<br>Oder die sechs",d5b:"KIPP-KNIFF-JOKER<br>kennenlernen?",d5c:"Klick auf Beginn-Button,<br>unten links.",fV:"Violett",fB:"Blau",fG:"Gr\u00fcn",fO:"Orange"};
     document.getElementById("btnSpielen").textContent = T.sp;
     document.getElementById("btnDemo").textContent = T.dm;
 
@@ -1924,6 +1931,15 @@
       }
       actionButton.style.left = '180px';
       actionButton.disabled = false;
+
+      // Auswertung-Button: 1 Zeile (45px) unterhalb der Kärtchen
+      const cardBottomZ = cardZ + 0.3125 / 2 + 0.15625; // card south edge + 1 cell
+      const abPos = new THREE.Vector3(0, cardY, cardBottomZ);
+      abPos.project(camera);
+      const abScreenY = (-abPos.y * 0.5 + 0.5) * 720;
+      const auswBtn = document.getElementById('auswertungBtn');
+      auswBtn.style.top = Math.round(abScreenY) + 'px';
+      auswBtn.style.display = 'block';
     }
 
 
@@ -2859,6 +2875,7 @@
       document.getElementById('skipEndBtn').style.display = 'none';
       document.getElementById('kippTarget').style.display = 'none';
       document.getElementById('brainScore').style.display = 'none';
+      document.getElementById('auswertungBtn').style.display = 'none';
       jokerRow.style.display = 'none'; jokerRow.style.opacity = '0';
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
@@ -2903,12 +2920,10 @@
       await showSubtitle(T.d5b, 3000);
       if (!autoDemoActive) return;
 
-      // Show eye icon (no pulse) + joker icons row during d5c
-      const eyeIconEl = document.getElementById('eyeIcon');
-      eyeIconEl.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
-      eyeIconEl.style.animation = 'none';
-      eyeIconEl.style.display = 'block';
-      document.getElementById('skipEndBtn').style.display = 'none';
+      // Show Beginn-Button (skipEndBtn) instead of eye during d5c
+      const skipBtnD5 = document.getElementById('skipEndBtn');
+      skipBtnD5.style.display = 'block';
+      document.getElementById('eyeIcon').style.display = 'none';
 
       // Position joker icons at exact card X positions, 20px below cards
       const vkP = new THREE.Vector3().copy(verdecktesMesh.position);
@@ -3035,7 +3050,7 @@
         // Show first 3 d1b lines normally
         for (let i = 0; i < T.d1b.length - 1; i++) {
           if (!autoDemoActive) return;
-          const dur = (i === 0) ? 4000 : 2500;
+          const dur = (i === 0) ? 4000 : (i === 2) ? 3500 : 2500;
           await showSubtitle(T.d1b[i], dur);
         }
         if (!autoDemoActive) return;
@@ -3101,7 +3116,7 @@
       // Auge ausblenden, skipEnd-Button einblenden (nur Tutorial)
       document.getElementById('eyeIcon').style.display = 'none';
       const skipBtnEl = document.getElementById('skipEndBtn');
-      skipBtnEl.style.top = (parseInt(timerTopPos || '553') + 38) + 'px';
+      skipBtnEl.style.top = (parseInt(timerTopPos || '553') + 50) + 'px';
       skipBtnEl.style.display = 'block';
 
       // ==========================================
@@ -3238,6 +3253,7 @@
       document.getElementById('skipEndBtn').style.display = 'none';
       document.getElementById('kippTarget').style.display = 'none';
       document.getElementById('brainScore').style.display = 'none';
+      document.getElementById('auswertungBtn').style.display = 'none';
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
       hideSubtitle();
@@ -3572,6 +3588,7 @@
         // "Neues Spiel" → Reset + direkt ins Spiel (ohne Erklärung)
         document.getElementById('brainScore').style.display = 'none';
         document.getElementById('brainScore').style.opacity = '0';
+        document.getElementById('auswertungBtn').style.display = 'none';
         isReplay = true;
         resetButton.click();
       }
