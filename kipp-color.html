@@ -577,6 +577,22 @@
     #btnDemo     { top: 519px; padding-top: 4px; font-size: 16px; letter-spacing: 2px; }
 
     /* === ZURUECK-BUTTON (zur Startseite) === */
+    /* Kipp-Stoppuhr */
+    #kippStopwatch {
+      display: none;
+      position: absolute;
+      top: 6px; right: 6px;
+      background: rgba(0,0,0,0.75);
+      color: #0f0;
+      font: bold 11px 'Courier New', monospace;
+      padding: 4px 7px;
+      border-radius: 4px;
+      white-space: pre;
+      z-index: 300;
+      pointer-events: none;
+      line-height: 1.4;
+      min-width: 120px;
+    }
   </style>
 </head>
 <body>
@@ -594,6 +610,7 @@
   </div>
   
   <div id="uiOverlay">
+    <div id="kippStopwatch"></div>
     <div id="handIcon">👆</div>
     <div id="hintText"></div>
     <div id="instructionText"></div>
@@ -1888,6 +1905,7 @@
     
     function showGameEnd() {
       gamePhase = 'ende';
+      swHide(); swStopLive();
       setButtonsDisabled(true);
       document.getElementById('richtungButtons').classList.add('hidden');
       kippButtons.classList.add('hidden');
@@ -1948,6 +1966,7 @@
 
     function startPausePhase() {
       gamePhase = 'pause';
+      swHide(); swStopLive();
       pauseExiting = false;
       document.getElementById('kippTarget').style.display = 'none';
 
@@ -2213,6 +2232,60 @@
     let liegeStartTime = null;
     let autoEvalTimeout = null;
     let countdownTimer = null;
+
+    // === Stoppuhr-System (empirische Erfassung) ===
+    let swKippStartMs = null;    // Zeitpunkt: Kipp beginnt (Drag aktiviert)
+    let swLandMs = null;         // Zeitpunkt: Kipp landet
+    let swKippDurations = [];    // Kippdauern in ms
+    let swLiegeDurations = [];   // Liegezeiten in ms
+    let swKippNr = 0;            // Kipp-Zähler
+
+    function swShow() {
+      const el = document.getElementById('kippStopwatch');
+      if (gamePhase === 'kippen' || gamePhase === 'spielen') {
+        el.style.display = 'block';
+      }
+    }
+    function swHide() {
+      document.getElementById('kippStopwatch').style.display = 'none';
+    }
+    function swUpdate() {
+      const el = document.getElementById('kippStopwatch');
+      let lines = ['#' + swKippNr + '  Q' + currentQuadrant];
+      if (swKippDurations.length > 0) {
+        lines.push('Kipp: ' + swKippDurations[swKippDurations.length - 1] + 'ms');
+      }
+      if (swLiegeDurations.length > 0) {
+        lines.push('Liege: ' + swLiegeDurations[swLiegeDurations.length - 1] + 'ms');
+      }
+      // Live-Liegezeit wenn Würfel liegt
+      if (swLandMs && !swKippStartMs) {
+        const live = Math.round(performance.now() - swLandMs);
+        lines.push('⏱ ' + live + 'ms');
+      }
+      el.textContent = lines.join('\n');
+    }
+    function swReset() {
+      swKippStartMs = null;
+      swLandMs = null;
+      swKippDurations = [];
+      swLiegeDurations = [];
+      swKippNr = 0;
+      const el = document.getElementById('kippStopwatch');
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+    // Live-Update alle 50ms
+    let swLiveInterval = null;
+    function swStartLive() {
+      if (swLiveInterval) return;
+      swLiveInterval = setInterval(() => {
+        if (swLandMs && !swKippStartMs) swUpdate();
+      }, 50);
+    }
+    function swStopLive() {
+      if (swLiveInterval) { clearInterval(swLiveInterval); swLiveInterval = null; }
+    }
 
     // UI für Demo-Phase initialisieren
     hintText.textContent = ''; // Leer lassen - Text-Sequenz übernimmt
@@ -3918,6 +3991,8 @@
 
     function startFreeSchauenPhase() {
       gamePhase = 'kippen';
+      swReset(); // Stoppuhr für neue Runde
+      swStartLive();
       
       // Ensure timerTopPos is set (skipped when isReplay bypasses spielziel)
       if (!timerTopPos) timerTopPos = '553px';
@@ -4005,6 +4080,7 @@
       
       // Abort auto-demo if active
       autoDemoActive = false;
+      swReset(); swStopLive();
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
@@ -4326,6 +4402,17 @@
 
         dragActive = true;
         dragCurrentAngle = 0;
+
+        // Stoppuhr: Kipp startet
+        swKippNr++;
+        swKippStartMs = performance.now();
+        if (swLandMs) {
+          const liege = Math.round(swKippStartMs - swLandMs);
+          swLiegeDurations.push(liege);
+        }
+        swUpdate();
+        swShow();
+        swStartLive();
       }
 
       // Rotation live berechnen
@@ -4464,6 +4551,9 @@
             cube.position.copy(newPos);
             cube.quaternion.copy(newQuat);
             kipGroup.add(cube);
+            // Stoppuhr: Zurückgefallen, kein Kipp gezählt
+            swKippStartMs = null;
+            swKippNr = Math.max(0, swKippNr - 1);
           } else {
             // Gekippt: finalisieren
             finalizeKipp(finalQ, null);
@@ -4474,6 +4564,16 @@
               kippDirection = isCW ? 'cw' : 'ccw';
               advanceTopFace();
             }
+
+            // Stoppuhr: Kipp gelandet
+            swLandMs = performance.now();
+            if (swKippStartMs) {
+              const kippDur = Math.round(swLandMs - swKippStartMs);
+              swKippDurations.push(kippDur);
+              swKippStartMs = null; // Reset für nächste Liegezeit-Messung
+              console.log(`[SW] Kipp#${swKippNr} → Q${currentQuadrant} | Kipp:${kippDur}ms | Liegezeiten:${JSON.stringify(swLiegeDurations)} | Kippdauern:${JSON.stringify(swKippDurations)}`);
+            }
+            swUpdate();
           }
           dragActive = false;
           dragPivotGroup = null;
