@@ -2988,6 +2988,7 @@
       totalObservationTime = 0;
       lockedKippDir = null;
       currentDragDir = null;
+      demoFromSpielen = false;
       offeneKippzieleVergeben = 0;
       openKippzielPositions = pickTwoRandomPositions();
       timerStarted = false;
@@ -3464,20 +3465,27 @@
     eyeEl.addEventListener('touchend', (e) => {
       e.stopPropagation();
       e.preventDefault();
-      if (gamePhase !== 'entscheidung') return;
-      if (activeCardIdx === 0 && !isReplay) {
-        spielzielToDemoPhase();
-      } else {
-        startFreeSchauenPhase();
+      if (gamePhase === 'entscheidung') {
+        if (activeCardIdx === 0 && !isReplay) {
+          spielzielToDemoPhase();
+        } else {
+          startFreeSchauenPhase();
+        }
+      } else if (gamePhase === 'spielen') {
+        // Auge im Spiel = Demo starten (wie im Tutorial)
+        startDemoFromSpielen();
       }
     }, { passive: false });
     eyeEl.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (gamePhase !== 'entscheidung') return;
-      if (activeCardIdx === 0 && !isReplay) {
-        spielzielToDemoPhase();
-      } else {
-        startFreeSchauenPhase();
+      if (gamePhase === 'entscheidung') {
+        if (activeCardIdx === 0 && !isReplay) {
+          spielzielToDemoPhase();
+        } else {
+          startFreeSchauenPhase();
+        }
+      } else if (gamePhase === 'spielen') {
+        startDemoFromSpielen();
       }
     });
     
@@ -3566,33 +3574,29 @@
       lockedKippDir = null;
       currentDragDir = null;
       
-      // Tutorial-Text NUR in Runde 1
-      const tutText = document.getElementById('tutorialText');
-      if (activeCardIdx === 0 && erstesKippziel && !isReplay) {
-        const zahl = erstesKippziel.zahl;
-        const farbe = FARB_DISPLAY[erstesKippziel.color.name] || erstesKippziel.color.name;
-        tutText.innerHTML = "<b>" + T.p1 + "</b><br>" + T.p2.replace("{zahl}",zahl).replace("{farbe}",farbe);
-        tutText.style.display = 'block';
-      } else {
-        tutText.style.display = 'none';
-      }
+      // Tutorial-Text nicht mehr nötig (freies Kippen statt Tap-Mechanik)
+      document.getElementById('tutorialText').style.display = 'none';
       
-      // Zielscheibe positionieren basierend auf aktuellem Quadranten
-      updateKippTargetPosition();
-      const targetEl = document.getElementById('kippTarget');
-      targetEl.style.display = 'block';
+      // Zielscheibe NICHT mehr anzeigen (kein Tap-Count-System)
+      document.getElementById('kippTarget').style.display = 'none';
       
       // Kein Timer-Display in Spielphase
       stopCountdown();
       countdown.style.display = 'none';
       
-      // kippCount zurücksetzen für 6-Kipp-Regel
+      // kippCount zurücksetzen für Kipp-Regel
       kippCount = 0;
       autoEvalTimeout = null;
       
-      // Tap-Counter zurücksetzen
+      // Tap-Counter nicht mehr nötig
       tapCount = 0;
-      updateTapIndicators();
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
+      
+      // Eye-Icon zeigen (für Demo-Abruf)
+      const eyeIcon = document.getElementById('eyeIcon');
+      if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
+      eyeIcon.style.display = 'block';
       
       // Liegezeit-Tracking (erste Liegezeit = Denkzeit, kein Auto-Eval)
       liegeZeiten = [];
@@ -3666,7 +3670,10 @@
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
-      document.getElementById('eyeIcon').style.display = 'none';
+      // Eye-Icon zeigen (für Demo-Abruf)
+      const eyeIcon = document.getElementById('eyeIcon');
+      if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
+      eyeIcon.style.display = 'block';
       
       // verdecktesMesh bleibt sichtbar (zeigt aufgedecktes Kippziel)
       verdecktesMesh.userData.revealed = true;
@@ -3679,9 +3686,8 @@
       lockedKippDir = null;
       currentDragDir = null;
       
-      // Zielscheibe positionieren und anzeigen
-      updateKippTargetPosition();
-      document.getElementById('kippTarget').style.display = 'block';
+      // Zielscheibe NICHT mehr anzeigen
+      document.getElementById('kippTarget').style.display = 'none';
       
       // Timer aus
       stopCountdown();
@@ -3691,9 +3697,10 @@
       kippCount = 0;
       autoEvalTimeout = null;
       
-      // Tap-Counter zurücksetzen
+      // Tap-Counter nicht mehr nötig
       tapCount = 0;
-      updateTapIndicators();
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
       
       // Liegezeit-Tracking
       liegeZeiten = [];
@@ -3806,14 +3813,13 @@
     let lastTouchPos = null;
     
     renderer.domElement.addEventListener('touchstart', (e) => {
-      if (((gamePhase === 'kippen' || gamePhase === 'entscheidung') && verdecktesMesh.visible && !verdecktesMesh.userData.revealed) ||
-          (gamePhase === 'spielen' && !kippzielChecked)) {
+      if ((gamePhase === 'kippen' || gamePhase === 'entscheidung') && verdecktesMesh.visible && !verdecktesMesh.userData.revealed) {
         lastTouchPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       }
     }, { passive: true });
     
     renderer.domElement.addEventListener('touchend', (e) => {
-      if ((gamePhase !== 'kippen' && gamePhase !== 'entscheidung') || !verdecktesMesh.visible || !lastTouchPos || verdecktesMesh.userData.revealed) return;
+      if (!verdecktesMesh.visible || !lastTouchPos || verdecktesMesh.userData.revealed) { lastTouchPos = null; return; }
       if (dragActive) { lastTouchPos = null; return; }
       
       const rect = renderer.domElement.getBoundingClientRect();
@@ -3822,35 +3828,43 @@
       vkRaycaster.setFromCamera(vkMouse, camera);
       
       if (vkRaycaster.intersectObject(verdecktesMesh).length > 0) {
-        revealVerdecktesKippziel();
+        if (gamePhase === 'entscheidung') {
+          // Kippziel-Klick = Auge-Klick: Schauen/Demo starten
+          if (activeCardIdx === 0 && !isReplay) {
+            spielzielToDemoPhase();
+          } else {
+            startFreeSchauenPhase();
+          }
+        } else if (gamePhase === 'kippen') {
+          revealVerdecktesKippziel();
+        }
       }
       lastTouchPos = null;
     }, { passive: true });
     
-    // Desktop-Klick: Kippziel aufdecken (kippen) ODER Würfel-Tap (spielen)
+    // Desktop-Klick: Kippziel aufdecken (kippen) oder Schauen starten (entscheidung)
     renderer.domElement.addEventListener('click', (e) => {
       const rect = renderer.domElement.getBoundingClientRect();
       vkMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       vkMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       vkRaycaster.setFromCamera(vkMouse, camera);
       
-      // Spielen: Tap auf Würfel
-      if (gamePhase === 'spielen' && !kippzielChecked && !isAnimating) {
-        if (vkRaycaster.intersectObject(cube).length > 0 && tapCount < 6) {
-          tapCount++;
-          updateTapIndicators();
-          
-        }
-        return;
-      }
-      
-      if ((gamePhase !== 'kippen' && gamePhase !== 'entscheidung') || !verdecktesMesh.visible || verdecktesMesh.userData.revealed) return;
+      if (!verdecktesMesh.visible || verdecktesMesh.userData.revealed) return;
       if (vkRaycaster.intersectObject(verdecktesMesh).length > 0) {
-        revealVerdecktesKippziel();
+        if (gamePhase === 'entscheidung') {
+          // Kippziel-Klick = Auge-Klick: Schauen/Demo starten
+          if (activeCardIdx === 0 && !isReplay) {
+            spielzielToDemoPhase();
+          } else {
+            startFreeSchauenPhase();
+          }
+        } else if (gamePhase === 'kippen') {
+          revealVerdecktesKippziel();
+        }
       }
     });
     
-    // (Spielen: Tap auf Würfel zählt Kipps, Swipe startet Auto-Kipp-Sequenz)
+    // (Spielen: Freies Kippen + 500ms Auto-Eval)
     
     // Kippziel-Check bei Tap auf Würfel
     function checkKippzielTap() {
@@ -3862,6 +3876,9 @@
         clearTimeout(autoEvalTimeout);
         autoEvalTimeout = null;
       }
+      
+      // Eye-Icon ausblenden bei Wertung
+      document.getElementById('eyeIcon').style.display = 'none';
       
       // Timer stoppen
       stopCountdown();
@@ -4075,6 +4092,37 @@
       // Würfel bleibt wo er ist - KEIN Reset!
     }
 
+    // === 500ms Liegezeit-Schwelle für Auto-Eval ===
+    const LIEGEZEIT_SCHWELLE = 500; // ms
+    let demoFromSpielen = false; // Flag: Demo wurde aus SPIELEN gestartet
+
+    // === Demo aus SPIELEN starten (Auge-Klick) ===
+    function startDemoFromSpielen() {
+      // Auto-Eval-Timeout löschen
+      if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
+      
+      demoFromSpielen = true;
+      gamePhase = 'demo';
+      
+      // UI ausblenden
+      document.getElementById('eyeIcon').style.display = 'none';
+      document.getElementById('tutorialText').style.display = 'none';
+      document.getElementById('kippTarget').style.display = 'none';
+      tapIndicatorA.mesh.visible = false;
+      tapIndicatorB.mesh.visible = false;
+      stopCountdown();
+      countdown.style.display = 'none';
+      
+      // Cube für Demo zurücksetzen auf Q3
+      cube.quaternion.set(0, 0, 0, 1);
+      cube.position.set(-offset, offset, 0.109375 + offset);
+      currentQuadrant = 3;
+      topFace = 'f2';
+      
+      // Demo-Animation starten (Wobble-Hand)
+      startDemoAnimation();
+    }
+
     backButton.addEventListener('click', () => {
       if (gamePhase !== 'kippen' && gamePhase !== 'spielen') return;
       gamePhase = 'kippen'; // Zurück zu Phase 2
@@ -4165,6 +4213,7 @@
       kippCount = 0;
       lockedKippDir = null;
       currentDragDir = null;
+      demoFromSpielen = false;
       erstesKippziel = null;
       kippzielChecked = false;
       totalObservationTime = 0;
@@ -4319,16 +4368,8 @@
       if (gamePhase === 'demo') {
         e.preventDefault(); // Touch während Demo verarbeiten
         
-        gamePhase = 'kippen';
         isDemoAnimating = false; // Animation sofort stoppen
         handDemo.visible = false; // Hand sofort ausblenden
-        
-        // SCHAUEN-Timer jetzt starten (60 Sek)
-        startCountdown(() => {
-          if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
-            revealVerdecktesKippziel();
-          }
-        }, 60);
         
         // ALLE State-Variablen sauber resetten
         cube.quaternion.set(0, 0, 0, 1); // Reset zu neutraler Rotation
@@ -4337,6 +4378,29 @@
         topFace = 'f2';
         dragActive = false;
         isAnimating = false;
+        
+        if (demoFromSpielen) {
+          // Zurück zu SPIELEN (Kippziel bleibt aktiv)
+          demoFromSpielen = false;
+          gamePhase = 'spielen';
+          kippzielChecked = false;
+          kippCount = 0;
+          
+          // Eye-Icon zeigen für nochmalige Demo
+          const eyeIcon = document.getElementById('eyeIcon');
+          eyeIcon.style.display = 'block';
+          
+        } else {
+          // Normal: Demo → KIPPEN
+          gamePhase = 'kippen';
+          
+          // SCHAUEN-Timer jetzt starten (60 Sek)
+          startCountdown(() => {
+            if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
+              revealVerdecktesKippziel();
+            }
+          }, 60);
+        }
         
         // Touch-Punkt SOFORT für Drag-System speichern
         const touch = e.touches[0];
@@ -4420,24 +4484,16 @@
         const direction = getValidDirection(deltaX, deltaY);
         if (!direction) { isSwiping = false; return; }
         
-        // SPIELEN-Phase: Swipe bestimmt Richtung → Auto-Kipp-Sequenz
-        if (gamePhase === 'spielen') {
-          isSwiping = false;
-          if (tapCount <= 0 || kippzielChecked || isAnimating) return;
-          
-          const isCW = CW_DIRS.has(direction);
-          lockedKippDir = isCW ? 'cw' : 'ccw';
-          kippDirection = lockedKippDir;
-          
-          // Tutorial-Text ausblenden
-          document.getElementById('tutorialText').style.display = 'none';
-          
-          // Auto-Kipp starten
-          runAutoKippSequence(tapCount);
-          return;
+        // SPIELEN-Phase: freies Dragging wie in KIPPEN (kein Auto-Kipp mehr)
+        // → durchfallen lassen zu normalem Drag-Code
+        
+        // Auto-Eval-Timer bei neuem Kipp abbrechen
+        if (gamePhase === 'spielen' && autoEvalTimeout) {
+          clearTimeout(autoEvalTimeout);
+          autoEvalTimeout = null;
         }
         
-        // SCHAUEN-Phase: normaler manueller Drag
+        // Manueller Drag
         currentDragDir = direction;
 
         const config = getKippConfig(direction);
@@ -4543,23 +4599,6 @@
       }
       isSwiping = false;
       
-      // SPIELEN-Phase: Tap auf Würfel = tapCount erhöhen
-      if (gamePhase === 'spielen' && !dragActive && !kippzielChecked && !isAnimating && lastTouchPos) {
-        const rect = renderer.domElement.getBoundingClientRect();
-        vkMouse.x = ((lastTouchPos.x - rect.left) / rect.width) * 2 - 1;
-        vkMouse.y = -((lastTouchPos.y - rect.top) / rect.height) * 2 + 1;
-        vkRaycaster.setFromCamera(vkMouse, camera);
-        if (vkRaycaster.intersectObject(cube).length > 0) {
-          if (tapCount < 6) {
-            tapCount++;
-            updateTapIndicators();
-            
-          }
-        }
-        lastTouchPos = null;
-        return;
-      }
-      
       if (!dragActive) return;
 
       // Tipping-Point bei 45° (PI/4)
@@ -4624,6 +4663,20 @@
               const isCW = CW_DIRS.has(currentDragDir);
               kippDirection = isCW ? 'cw' : 'ccw';
               advanceTopFace();
+            }
+
+            // SPIELEN: kippCount erhöhen + 500ms Auto-Eval-Timer
+            if (gamePhase === 'spielen' && !kippzielChecked) {
+              kippCount++;
+              // Vorherigen Auto-Eval-Timer löschen
+              if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
+              // 500ms Liegezeit-Schwelle: wenn Würfel 500ms liegt → Wertung
+              autoEvalTimeout = setTimeout(() => {
+                if (gamePhase === 'spielen' && !kippzielChecked && !isAnimating && !dragActive) {
+                  console.log('[AUTO-EVAL] 500ms Liegezeit überschritten → Wertung nach ' + kippCount + ' Kipps');
+                  checkKippzielTap();
+                }
+              }, LIEGEZEIT_SCHWELLE);
             }
 
             // Stoppuhr: Kipp gelandet
