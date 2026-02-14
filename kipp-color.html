@@ -582,7 +582,7 @@
       display: none;
       position: absolute;
       top: 6px; right: 6px;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.82);
       color: #0f0;
       font: bold 11px 'Courier New', monospace;
       padding: 4px 7px;
@@ -591,7 +591,18 @@
       z-index: 300;
       pointer-events: none;
       line-height: 1.4;
-      min-width: 120px;
+      min-width: 130px;
+    }
+    #kippStopwatch.sw-summary {
+      top: 50%; left: 50%;
+      right: auto;
+      transform: translate(-50%, -50%);
+      font-size: 13px;
+      padding: 12px 16px;
+      min-width: 260px;
+      text-align: left;
+      pointer-events: auto;
+      border: 1px solid #0f0;
     }
   </style>
 </head>
@@ -2236,9 +2247,11 @@
     // === Stoppuhr-System (empirische Erfassung) ===
     let swKippStartMs = null;    // Zeitpunkt: Kipp beginnt (Drag aktiviert)
     let swLandMs = null;         // Zeitpunkt: Kipp landet
-    let swKippDurations = [];    // Kippdauern in ms
-    let swLiegeDurations = [];   // Liegezeiten in ms
+    let swKippDurations = [];    // Kippdauern in ms (Ecke-zu-Ecke)
+    let swLiegeDurations = [];   // Liegezeiten in ms (ab erster Berührung)
     let swKippNr = 0;            // Kipp-Zähler
+    const SW_MAX_KIPPS = 36;     // Ziel-Anzahl Kipps
+    let swFinished = false;      // true wenn 36 erreicht
 
     function swShow() {
       const el = document.getElementById('kippStopwatch');
@@ -2251,7 +2264,8 @@
     }
     function swUpdate() {
       const el = document.getElementById('kippStopwatch');
-      let lines = ['#' + swKippNr + '  Q' + currentQuadrant];
+      if (swFinished) return; // Summary bleibt stehen
+      let lines = ['#' + swKippNr + '/' + SW_MAX_KIPPS + '  Q' + currentQuadrant];
       if (swKippDurations.length > 0) {
         lines.push('Kipp: ' + swKippDurations[swKippDurations.length - 1] + 'ms');
       }
@@ -2265,15 +2279,58 @@
       }
       el.textContent = lines.join('\n');
     }
+    function swShowSummary() {
+      swFinished = true;
+      swStopLive();
+      const el = document.getElementById('kippStopwatch');
+      el.classList.add('sw-summary');
+      el.style.display = 'block';
+
+      const avgKipp = swKippDurations.length > 0
+        ? Math.round(swKippDurations.reduce((a,b) => a+b, 0) / swKippDurations.length)
+        : 0;
+      const avgLiege = swLiegeDurations.length > 0
+        ? Math.round(swLiegeDurations.reduce((a,b) => a+b, 0) / swLiegeDurations.length)
+        : 0;
+      const minKipp = swKippDurations.length > 0 ? Math.min(...swKippDurations) : 0;
+      const maxKipp = swKippDurations.length > 0 ? Math.max(...swKippDurations) : 0;
+      const minLiege = swLiegeDurations.length > 0 ? Math.min(...swLiegeDurations) : 0;
+      const maxLiege = swLiegeDurations.length > 0 ? Math.max(...swLiegeDurations) : 0;
+
+      let txt = '══ MESSUNG FERTIG ══\n';
+      txt += SW_MAX_KIPPS + ' Kipps gemessen\n\n';
+      txt += '─── Kippdauer (Ecke→Ecke) ───\n';
+      txt += '  Ø ' + avgKipp + 'ms\n';
+      txt += '  Min ' + minKipp + 'ms  Max ' + maxKipp + 'ms\n\n';
+      txt += '─── Liegezeit ───\n';
+      txt += '  Ø ' + avgLiege + 'ms\n';
+      txt += '  Min ' + minLiege + 'ms  Max ' + maxLiege + 'ms\n\n';
+      txt += '─── Alle Kippdauern ───\n';
+      for (let i = 0; i < swKippDurations.length; i += 6) {
+        txt += '  ' + swKippDurations.slice(i, i+6).join(', ') + '\n';
+      }
+      txt += '\n─── Alle Liegezeiten ───\n';
+      for (let i = 0; i < swLiegeDurations.length; i += 6) {
+        txt += '  ' + swLiegeDurations.slice(i, i+6).join(', ') + '\n';
+      }
+      el.textContent = txt;
+
+      console.log('[SW] ══ MESSUNG FERTIG ══');
+      console.log('[SW] Kippdauern:', JSON.stringify(swKippDurations));
+      console.log('[SW] Liegezeiten:', JSON.stringify(swLiegeDurations));
+      console.log('[SW] Ø Kippdauer:', avgKipp, 'ms | Ø Liegezeit:', avgLiege, 'ms');
+    }
     function swReset() {
       swKippStartMs = null;
       swLandMs = null;
       swKippDurations = [];
       swLiegeDurations = [];
       swKippNr = 0;
+      swFinished = false;
       const el = document.getElementById('kippStopwatch');
       el.textContent = '';
       el.style.display = 'none';
+      el.classList.remove('sw-summary');
     }
     // Live-Update alle 50ms
     let swLiveInterval = null;
@@ -4403,16 +4460,18 @@
         dragActive = true;
         dragCurrentAngle = 0;
 
-        // Stoppuhr: Kipp startet
-        swKippNr++;
-        swKippStartMs = performance.now();
-        if (swLandMs) {
-          const liege = Math.round(swKippStartMs - swLandMs);
-          swLiegeDurations.push(liege);
+        // Stoppuhr: Kipp startet (nur bis 36)
+        if (!swFinished) {
+          swKippNr++;
+          swKippStartMs = performance.now();
+          if (swLandMs) {
+            const liege = Math.round(swKippStartMs - swLandMs);
+            swLiegeDurations.push(liege);
+          }
+          swUpdate();
+          swShow();
+          swStartLive();
         }
-        swUpdate();
-        swShow();
-        swStartLive();
       }
 
       // Rotation live berechnen
@@ -4552,8 +4611,10 @@
             cube.quaternion.copy(newQuat);
             kipGroup.add(cube);
             // Stoppuhr: Zurückgefallen, kein Kipp gezählt
-            swKippStartMs = null;
-            swKippNr = Math.max(0, swKippNr - 1);
+            if (!swFinished) {
+              swKippStartMs = null;
+              swKippNr = Math.max(0, swKippNr - 1);
+            }
           } else {
             // Gekippt: finalisieren
             finalizeKipp(finalQ, null);
@@ -4572,6 +4633,11 @@
               swKippDurations.push(kippDur);
               swKippStartMs = null; // Reset für nächste Liegezeit-Messung
               console.log(`[SW] Kipp#${swKippNr} → Q${currentQuadrant} | Kipp:${kippDur}ms | Liegezeiten:${JSON.stringify(swLiegeDurations)} | Kippdauern:${JSON.stringify(swKippDurations)}`);
+              // Nach 36 Kipps: Summary anzeigen
+              if (swKippNr >= SW_MAX_KIPPS) {
+                swShowSummary();
+                return; // Keine weitere Updates
+              }
             }
             swUpdate();
           }
