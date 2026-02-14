@@ -793,9 +793,9 @@
     
     camera.lookAt(0, 0.46875, 0.7 + southShift);
     
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(360, 720);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(360, 720);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     
