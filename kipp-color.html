@@ -73,7 +73,7 @@
     
     #brainScore {
       position: absolute;
-      top: 526px;
+      top: 460px;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
@@ -1877,41 +1877,28 @@
       setButtonsDisabled(false);
     }
     
-    function calculateBrainScore(observationTime, hits) {
-      // Constants
-      const FREE_TIME = 20;
-      const MAX_TIME = 30;
-      const EXTRA_TIME_RANGE = 100; // MAX_TIME - FREE_TIME
-      const k = 1.0;
-      const c = 2.5976583;
+    function calculateBrainScore(hits, kniffs, zugfaktor) {
+      // BRAIN SCORE = 100 × H^0.75 × e^(−0.55·K) × (1 − 5/6·(1−Z)³)
+      // H = hits/6, K = kniffs/6, Z = zugfaktor (0-1)
       
-      // Special case: no hits
-      if (hits === 0) {
-        return "No Hit, no Score";
-      }
+      if (hits === 0) return 0;
       
-      // Clamp observation time
-      let T = observationTime;
-      if (T < FREE_TIME) T = FREE_TIME;
-      if (T > MAX_TIME) T = MAX_TIME;
+      const H = hits / 6;
+      const K = kniffs / 6;
+      const Z = Math.max(0, Math.min(1, zugfaktor));
       
-      // Time Factor
-      const E = Math.max(0, Math.min(T - FREE_TIME, EXTRA_TIME_RANGE));
-      const S_time = 1 - 0.31 * Math.pow(E / EXTRA_TIME_RANGE, 0.855);
+      const hitFactor = Math.pow(H, 0.75);
+      const kniffFactor = Math.exp(-0.55 * K);
+      const zugFactor = 1 - (5/6) * Math.pow(1 - Z, 3);
       
-      // Hit Factor (logistic)
-      const L = (H) => 1 / (1 + Math.exp(-k * (H - c)));
-      const S_hits = L(hits) / L(6);
-      
-      // Final Brain Score
-      const brainScore = 100 * S_time * S_hits;
-      
-      // Formatierung: 1 Kommastelle mit %, außer bei 100%
-      if (Math.abs(brainScore - 100) < 0.05) {
-        return "100%";
-      } else {
-        return brainScore.toFixed(1).replace('.', ',') + '%';
-      }
+      return Math.round(100 * hitFactor * kniffFactor * zugFactor);
+    }
+    
+    function berechneZugfaktor() {
+      // Keine Liegezeiten = neutral (1.0)
+      if (spielenLiegezeiten.length === 0) return 1.0;
+      const zuegig = spielenLiegezeiten.filter(lz => lz < ZUEGIG_SCHWELLE).length;
+      return zuegig / spielenLiegezeiten.length;
     }
     
     function showGameEnd() {
@@ -1932,43 +1919,157 @@
       // Wie viele Treffer?
       const treffer = bereitsGetroffen.size;
       
+      // Zugfaktor berechnen
+      const Z = berechneZugfaktor();
+      const zuegigPct = spielenLiegezeiten.length > 0 
+        ? Math.round((spielenLiegezeiten.filter(lz => lz < ZUEGIG_SCHWELLE).length / spielenLiegezeiten.length) * 100)
+        : 100;
+      
       // Brain Score berechnen
-      const scoreValue = calculateBrainScore(totalObservationTime, treffer);
+      const scoreValue = calculateBrainScore(treffer, kniffsCount, Z);
+      
+      // Daten für Auswertung speichern
+      window._brainScoreData = {
+        score: scoreValue,
+        hits: treffer,
+        kniffs: kniffsCount,
+        zugfaktor: Z,
+        zuegigPct: zuegigPct,
+        zoegerndPct: 100 - zuegigPct,
+        liegezeiten: spielenLiegezeiten.slice()
+      };
       
       // hintText verstecken
       hintText.style.display = 'none';
       
-      // Brain Score anzeigen
+      // Brain Score anzeigen (nur Zahl, groß)
       const brainScore = document.getElementById('brainScore');
-      if (scoreValue === "No Hit, no Score") {
-        brainScore.innerHTML = '<span style="font-size:12pt;font-weight:bold;">' + T.bs + ':<br>' + T.nh + '</span>' +
-          '<br><span style="font-size:10pt;font-weight:normal;">' + T.st.replace("{t}",treffer).replace("{z}",totalObservationTime) + '</span>';
-      } else {
-        brainScore.innerHTML = '<span style="font-size:12pt;font-weight:bold;">' + T.bs + ': ' + scoreValue + '</span>' +
-          '<br><span style="font-size:10pt;font-weight:normal;">' + T.bw + '</span>' +
-          '<br><span style="font-size:10pt;font-weight:normal;">' + T.st.replace("{t}",treffer).replace("{z}",totalObservationTime) + '</span>';
-      }
+      brainScore.innerHTML = 
+        '<div style="font-size:11px;letter-spacing:2px;margin-bottom:4px;opacity:0.7;">YOUR</div>' +
+        '<div style="font-size:22px;font-weight:bold;letter-spacing:3px;">BRAIN SCORE</div>' +
+        '<div style="font-size:48px;font-weight:bold;margin:6px 0;' +
+          'text-shadow:0 0 20px rgba(212,180,140,0.4);">' + scoreValue + '</div>' +
+        '<div style="font-size:13px;opacity:0.8;">' +
+          treffer + '/6 HITS &nbsp;·&nbsp; ' + 
+          kniffsCount + '/6 KNIFFS &nbsp;·&nbsp; ⚡' + 
+          (Z * 6).toFixed(1) + '</div>';
       brainScore.style.display = 'block';
       brainScore.style.opacity = '1';
       
-      // "Neues Spiel" Button anzeigen (Position wie Auge/Timer/weiter)
-      actionButton.textContent = T.n;
-      actionButton.style.display = 'block';
-      actionButton.style.opacity = '1';
-      if (timerTopPos) {
-        actionButton.style.top = timerTopPos;
-      }
-      actionButton.style.left = '180px';
-      actionButton.disabled = false;
+      // actionButton verstecken (kein "Neues Spiel" mehr hier)
+      actionButton.style.display = 'none';
 
-      // Auswertung-Button: 1 Zeile (45px) unterhalb der Kärtchen
-      const cardBottomZ = cardZ + 0.3125 / 2 + 0.15625; // card south edge + 1 cell
+      // Auswertung-Button anzeigen
+      const cardBottomZ = cardZ + 0.3125 / 2 + 0.15625;
       const abPos = new THREE.Vector3(0, cardY, cardBottomZ);
       abPos.project(camera);
       const abScreenY = (-abPos.y * 0.5 + 0.5) * 720;
       const auswBtn = document.getElementById('auswertungBtn');
       auswBtn.style.top = Math.round(abScreenY) + 'px';
       auswBtn.style.display = 'block';
+    }
+    
+    // === AUSWERTUNG Overlay ===
+    function showAuswertung() {
+      const d = window._brainScoreData;
+      if (!d) return;
+      
+      // Kippstil-Titel
+      let kippTitel, kippMsg;
+      if (d.zuegigPct >= 80) {
+        kippTitel = 'KIPPMEISTER';
+        kippMsg = 'Jeder Kipp saß. Du planst und handelst.';
+      } else if (d.zuegigPct >= 50) {
+        kippTitel = 'TAKTIKER';
+        kippMsg = 'Guter Mix. Etwas mehr Planung vorher und du bist top.';
+      } else if (d.zuegigPct >= 25) {
+        kippTitel = 'GRÜBLER';
+        kippMsg = 'Plane Anzahl und Richtung VOR dem Kippen!';
+      } else {
+        kippTitel = 'BEOBACHTER';
+        kippMsg = 'Merke dir die Zahlen-Lagen beim Schauen, dann kippe entschlossen.';
+      }
+      
+      // KNIFFS-Kommentar
+      let kniffMsg;
+      if (d.kniffs === 0) {
+        kniffMsg = 'Perfektes Gedächtnis! Kein Schauen gebraucht.';
+      } else if (d.kniffs <= 2) {
+        kniffMsg = 'Gute Merkleistung. Nur ' + d.kniffs + '× nachgeschaut.';
+      } else if (d.kniffs <= 4) {
+        kniffMsg = d.kniffs + '× nachgeschaut. Versuche, dir mehr Lagen zu merken.';
+      } else {
+        kniffMsg = 'Viel geschaut. Nutze die Demo-Runde intensiver zum Merken!';
+      }
+      
+      // Overlay erstellen
+      const ov = document.createElement('div');
+      ov.id = 'auswertungOverlay';
+      ov.style.cssText = 'position:absolute;top:0;left:0;width:360px;height:720px;' +
+        'background:rgba(20,12,8,0.95);z-index:300;display:flex;flex-direction:column;' +
+        'align-items:center;justify-content:center;font-family:Arial,sans-serif;' +
+        'color:#d4b48c;pointer-events:auto;padding:20px;box-sizing:border-box;';
+      
+      ov.innerHTML = 
+        '<div style="font-size:11px;letter-spacing:2px;opacity:0.5;margin-bottom:2px;">YOUR</div>' +
+        '<div style="font-size:20px;font-weight:bold;letter-spacing:3px;">BRAIN SCORE</div>' +
+        '<div style="font-size:56px;font-weight:bold;margin:8px 0;' +
+          'text-shadow:0 0 25px rgba(212,180,140,0.4);">' + d.score + '</div>' +
+        
+        // Drei Faktoren
+        '<div style="display:flex;gap:18px;margin:10px 0 18px;font-size:14px;">' +
+          '<div style="text-align:center;">' +
+            '<div style="font-size:28px;font-weight:bold;">' + d.hits + '<span style="font-size:16px;opacity:0.6;">/6</span></div>' +
+            '<div style="font-size:10px;letter-spacing:1px;opacity:0.6;">HITS</div>' +
+          '</div>' +
+          '<div style="text-align:center;">' +
+            '<div style="font-size:28px;font-weight:bold;">' + d.kniffs + '<span style="font-size:16px;opacity:0.6;">/6</span></div>' +
+            '<div style="font-size:10px;letter-spacing:1px;opacity:0.6;">KNIFFS</div>' +
+          '</div>' +
+          '<div style="text-align:center;">' +
+            '<div style="font-size:28px;font-weight:bold;">⚡' + (d.zugfaktor * 6).toFixed(1) + '</div>' +
+            '<div style="font-size:10px;letter-spacing:1px;opacity:0.6;">ZUGFAKTOR</div>' +
+          '</div>' +
+        '</div>' +
+        
+        // Trennlinie
+        '<div style="width:200px;height:1px;background:rgba(212,180,140,0.25);margin:4px 0 14px;"></div>' +
+        
+        // Kippstil
+        '<div style="text-align:center;margin-bottom:12px;">' +
+          '<div style="font-size:14px;font-weight:bold;letter-spacing:2px;margin-bottom:6px;">' + kippTitel + '</div>' +
+          '<div style="font-size:12px;opacity:0.8;line-height:1.5;">' +
+            '<span style="color:#cedb25;">' + d.zuegigPct + '%</span> entschlossen gekippt<br>' +
+            '<span style="color:#e07040;">' + d.zoegerndPct + '%</span> geschaut &amp; gezögert' +
+          '</div>' +
+          '<div style="font-size:11px;opacity:0.6;margin-top:6px;font-style:italic;max-width:260px;">' + kippMsg + '</div>' +
+        '</div>' +
+        
+        // KNIFFS-Kommentar
+        '<div style="font-size:11px;opacity:0.6;margin-bottom:20px;max-width:260px;text-align:center;line-height:1.4;">' +
+          '👁 ' + kniffMsg +
+        '</div>' +
+        
+        // Neues Spiel Button
+        '<button id="neuesSpielBtn" style="width:200px;height:49px;' +
+          'background:url(\'button_kurz.webp\') center/contain no-repeat;' +
+          'border:none;cursor:pointer;font-family:Arial,sans-serif;' +
+          'font-size:15px;font-weight:bold;letter-spacing:1.5px;' +
+          'color:#2a1810;text-shadow:0 1px 0 rgba(255,255,255,0.3);">' +
+          T.n + '</button>';
+      
+      document.getElementById('uiOverlay').appendChild(ov);
+      
+      // Neues Spiel Button Handler
+      document.getElementById('neuesSpielBtn').addEventListener('click', () => {
+        ov.remove();
+        document.getElementById('brainScore').style.display = 'none';
+        document.getElementById('brainScore').style.opacity = '0';
+        document.getElementById('auswertungBtn').style.display = 'none';
+      const aov = document.getElementById('auswertungOverlay'); if (aov) aov.remove();
+        isReplay = true;
+        resetButton.click();
+      });
     }
 
 
@@ -2243,6 +2344,11 @@
     let liegeStartTime = null;
     let autoEvalTimeout = null;
     let countdownTimer = null;
+    
+    // === BRAIN SCORE Tracking ===
+    let kniffsCount = 0;            // Wie oft Schauen-Demo genutzt
+    let spielenLiegezeiten = [];    // Alle Liegezeiten in SPIELEN (ms)
+    let lastKippLandTime = null;    // Zeitpunkt des letzten Kipp-Landens in SPIELEN
 
     // === Stoppuhr-System (empirische Erfassung) ===
     let swKippStartMs = null;    // Zeitpunkt: Kipp beginnt (Drag aktiviert)
@@ -2989,6 +3095,9 @@
       lockedKippDir = null;
       currentDragDir = null;
       schauenFromSpielen = false;
+      kniffsCount = 0;
+      spielenLiegezeiten = [];
+      lastKippLandTime = null;
       offeneKippzieleVergeben = 0;
       openKippzielPositions = pickTwoRandomPositions();
       timerStarted = false;
@@ -3007,6 +3116,7 @@
       document.getElementById('kippTarget').style.display = 'none';
       document.getElementById('brainScore').style.display = 'none';
       document.getElementById('auswertungBtn').style.display = 'none';
+      const aov = document.getElementById('auswertungOverlay'); if (aov) aov.remove();
       jokerRow.style.display = 'none'; jokerRow.style.opacity = '0';
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
@@ -3385,6 +3495,7 @@
       document.getElementById('kippTarget').style.display = 'none';
       document.getElementById('brainScore').style.display = 'none';
       document.getElementById('auswertungBtn').style.display = 'none';
+      const aov = document.getElementById('auswertungOverlay'); if (aov) aov.remove();
       actionButton.style.display = 'none';
       countdown.style.display = 'none';
       hideSubtitle();
@@ -3403,6 +3514,9 @@
       bereitsGetroffen.clear();
       bereitsAusgegeben.clear();
       activeCardIdx = 0;
+      kniffsCount = 0;
+      spielenLiegezeiten = [];
+      lastKippLandTime = null;
       gamePhase = 'start';
     }
     
@@ -3507,6 +3621,11 @@
       if (texturesReady) runAutoDemo();
     });
     
+    // Auswertung-Button → Detail-Overlay
+    document.getElementById('auswertungBtn').addEventListener('click', () => {
+      if (gamePhase === 'ende') showAuswertung();
+    });
+    
     // Spielziel → Demo Übergang (jetzt von Entscheidung aufgerufen)
     function spielzielToDemoPhase() {
       gamePhase = 'demo';
@@ -3602,6 +3721,7 @@
       // Liegezeit-Tracking (erste Liegezeit = Denkzeit, kein Auto-Eval)
       liegeZeiten = [];
       liegeStartTime = performance.now();
+      lastKippLandTime = null;
 
       // Kärtchen werden in fillAllCards() sichtbar gemacht - NICHT hier
 
@@ -3706,6 +3826,7 @@
       // Liegezeit-Tracking
       liegeZeiten = [];
       liegeStartTime = performance.now();
+      lastKippLandTime = null;
       
       // Aktuelles Kärtchen mit dem generierten Kippziel befüllen
       if (erstesKippziel) {
@@ -3723,12 +3844,8 @@
       } else if (gamePhase === 'pause') {
         endPausePhase();
       } else if (gamePhase === 'ende') {
-        // "Neues Spiel" → Reset + direkt ins Spiel (ohne Erklärung)
-        document.getElementById('brainScore').style.display = 'none';
-        document.getElementById('brainScore').style.opacity = '0';
-        document.getElementById('auswertungBtn').style.display = 'none';
-        isReplay = true;
-        resetButton.click();
+        // Ende-Phase: actionButton ist versteckt, nichts tun
+        return;
       }
     });
     
@@ -4092,11 +4209,15 @@
     }
 
     // === 650ms Liegezeit-Schwelle für Auto-Eval ===
-    const LIEGEZEIT_SCHWELLE = 650; // ms
+    const LIEGEZEIT_SCHWELLE = 1000; // ms – 1 Sek = Kippzug eingeloggt
+    const ZUEGIG_SCHWELLE = 500;     // ms – darunter = zügig gekippt
     let schauenFromSpielen = false; // Flag: Demo wurde aus SPIELEN gestartet
 
     // === Schauen aus SPIELEN (Auge-Klick) ===
     function startSchauenDemo() {
+      // KNIFF zählen
+      kniffsCount++;
+      
       // Auto-Eval-Timeout löschen
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
       
@@ -4188,6 +4309,7 @@
       // Abort auto-demo if active
       autoDemoActive = false;
       schauenFromSpielen = false;
+      const aovReset = document.getElementById('auswertungOverlay'); if (aovReset) aovReset.remove();
       swReset(); swStopLive();
       
       stopCountdown();
@@ -4519,6 +4641,17 @@
         dragActive = true;
         dragCurrentAngle = 0;
 
+        // SPIELEN: Liegezeit tracken (für Zugfaktor)
+        if (gamePhase === 'spielen' && lastKippLandTime) {
+          const liege = performance.now() - lastKippLandTime;
+          spielenLiegezeiten.push(Math.round(liege));
+        }
+        // SPIELEN: Auto-Eval-Timer abbrechen bei neuem Kipp-Start
+        if (gamePhase === 'spielen' && autoEvalTimeout) {
+          clearTimeout(autoEvalTimeout);
+          autoEvalTimeout = null;
+        }
+
         // Stoppuhr: Kipp startet (nur bis 36)
         if (!swFinished) {
           swKippNr++;
@@ -4668,12 +4801,13 @@
               advanceTopFace();
             }
 
-            // SPIELEN: kippCount erhöhen + 500ms Auto-Eval-Timer
+            // SPIELEN: kippCount erhöhen + Auto-Eval-Timer
             if (gamePhase === 'spielen' && !kippzielChecked) {
               kippCount++;
+              lastKippLandTime = performance.now();
               // Vorherigen Auto-Eval-Timer löschen
               if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
-              // 500ms Liegezeit-Schwelle: wenn Würfel 500ms liegt → Wertung
+              // Liegezeit-Schwelle: wenn Würfel 1s liegt → Kippzug eingeloggt
               autoEvalTimeout = setTimeout(() => {
                 if (gamePhase === 'spielen' && !kippzielChecked && !isAnimating && !dragActive) {
                   checkKippzielTap();
