@@ -1261,7 +1261,7 @@
       }
       return arr;
     }
-    const deck = shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
+    let deck = shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
 
     // Slot-Zuordnung: welche Zelle auf welcher Face → deck-Index
     // f0: 7=S1, 4=S2, 2=S3, 3=S4
@@ -1982,7 +1982,7 @@
           'background:url(\'button_kurz.webp\') center/contain no-repeat;' +
           'border:none;cursor:pointer;font-family:Arial,sans-serif;' +
           'font-size:15px;font-weight:bold;letter-spacing:1.5px;' +
-          'color:#2a1810;text-shadow:0 1px 0 rgba(255,255,255,0.3);">' +
+          'color:#d0d0d0;text-shadow:0 1px 1px rgba(255,255,255,0.4), 0 -1px 1px rgba(0,0,0,0.6);">' +
           T.n + '</button>';
       
       document.getElementById('uiOverlay').appendChild(ov);
@@ -3157,6 +3157,13 @@
       kniffsCount = 0;
       spielenLiegezeiten = [];
       lastKippLandTime = null;
+      
+      // Würfelzahlen neu mischen und Faces neu aufbauen
+      deck = shuffle([1,2,3,4,5,6,7,8,9,10,11,12]);
+      rebuildFaceMat('f0', 1);
+      rebuildFaceMat('f1', 1);
+      rebuildFaceMat('f2', 1);
+      
       gamePhase = 'start';
     }
     
