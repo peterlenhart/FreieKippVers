@@ -157,7 +157,7 @@
       top: 475px;
       left: 50%;
       transform: translateX(-50%);
-      width: 120px;
+      width: 156px;
       height: auto;
       cursor: pointer;
       pointer-events: auto;
@@ -2872,7 +2872,7 @@
       // 1) SHOW EYE ONLY + subtitle sequence
       // ==========================================
       const eyeIcon = document.getElementById('eyeIcon');
-      eyeIcon.style.top = (parseInt(timerTopPos || '553') + 26) + 'px';
+      eyeIcon.style.top = (parseInt(timerTopPos || '553') - 34) + 'px';
       eyeIcon.style.animation = '';
       eyeIcon.style.display = 'block';
       document.getElementById('skipEndBtn').style.display = 'none';
@@ -3343,10 +3343,8 @@
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
       
-      // Eye-Icon zeigen (für Demo-Abruf)
-      const eyeIcon = document.getElementById('eyeIcon');
-      if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
-      eyeIcon.style.display = 'block';
+      // Eye-Icon nicht mehr zeigen (nur einmalig zu Spielbeginn)
+      document.getElementById('eyeIcon').style.display = 'none';
       
       // Liegezeit-Tracking (erste Liegezeit = Denkzeit, kein Auto-Eval)
       liegeZeiten = [];
@@ -3421,10 +3419,8 @@
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
       document.getElementById('entscheidungText').style.display = 'none';
-      // Eye-Icon zeigen (für Demo-Abruf)
-      const eyeIcon = document.getElementById('eyeIcon');
-      if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
-      eyeIcon.style.display = 'block';
+      // Eye-Icon nicht mehr zeigen (nur einmalig zu Spielbeginn)
+      document.getElementById('eyeIcon').style.display = 'none';
       
       // verdecktesMesh bleibt sichtbar (zeigt aufgedecktes Kippziel)
       verdecktesMesh.userData.revealed = true;
@@ -3793,10 +3789,8 @@
       verdecktesMesh.scale.set(1, 1, 1);
       verdecktesMat.opacity = 1;
       
-      // Auge an fester Position einblenden (zentriert, pulsierend)
-      const eyeIcon = document.getElementById('eyeIcon');
-      eyeIcon.style.animation = '';
-      eyeIcon.style.display = 'block';
+      // Eye-Icon nicht mehr zeigen (nur einmalig zu Spielbeginn)
+      document.getElementById('eyeIcon').style.display = 'none';
       
       // Timer ausblenden
       countdown.style.display = 'none';
@@ -3894,9 +3888,8 @@
         gamePhase = 'spielen';
         kippzielChecked = false;
         kippCount = 0;
-        const eyeIcon = document.getElementById('eyeIcon');
-        if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
-        eyeIcon.style.display = 'block';
+        // Eye-Icon nicht mehr zeigen (nur einmalig zu Spielbeginn)
+        document.getElementById('eyeIcon').style.display = 'none';
       } else {
         gamePhase = 'kippen';
         // Kein Timer - stattdessen verdecktes Kippziel pulsierend anzeigen
@@ -4228,10 +4221,8 @@
           kippzielChecked = false;
           kippCount = 0;
           
-          // Eye-Icon wieder zeigen
-          const eyeIcon = document.getElementById('eyeIcon');
-          if (timerTopPos) eyeIcon.style.top = (parseInt(timerTopPos) + 26) + 'px';
-          eyeIcon.style.display = 'block';
+          // Eye-Icon nicht mehr zeigen (nur einmalig zu Spielbeginn)
+          document.getElementById('eyeIcon').style.display = 'none';
         } else {
           // Normal: Demo → KIPPEN
           gamePhase = 'kippen';
