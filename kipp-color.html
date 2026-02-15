@@ -577,33 +577,6 @@
     #btnDemo     { top: 519px; padding-top: 4px; font-size: 16px; letter-spacing: 2px; }
 
     /* === ZURUECK-BUTTON (zur Startseite) === */
-    /* Kipp-Stoppuhr */
-    #kippStopwatch {
-      display: none;
-      position: absolute;
-      top: 6px; right: 6px;
-      background: rgba(0,0,0,0.82);
-      color: #0f0;
-      font: bold 11px 'Courier New', monospace;
-      padding: 4px 7px;
-      border-radius: 4px;
-      white-space: pre;
-      z-index: 300;
-      pointer-events: none;
-      line-height: 1.4;
-      min-width: 130px;
-    }
-    #kippStopwatch.sw-summary {
-      top: 50%; left: 50%;
-      right: auto;
-      transform: translate(-50%, -50%);
-      font-size: 13px;
-      padding: 12px 16px;
-      min-width: 260px;
-      text-align: left;
-      pointer-events: auto;
-      border: 1px solid #0f0;
-    }
   </style>
 </head>
 <body>
@@ -621,7 +594,6 @@
   </div>
   
   <div id="uiOverlay">
-    <div id="kippStopwatch"></div>
     <div id="handIcon">👆</div>
     <div id="hintText"></div>
     <div id="instructionText"></div>
@@ -632,7 +604,7 @@
     <div id="kippTarget"></div>
     <div id="brainScore"></div>
     <button id="auswertungBtn">AUSWERTUNG</button>
-    <div id="countdown">60</div>
+    <div id="countdown">30</div>
     <div id="demoSubtitle"></div>
     <div id="jokerIconsRow"></div>
     <img id="eyeIcon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABsCAYAAADt5bniAAAYAElEQVR42u3ceZBc1X0v8O85d+l7u3ump5fZ90XLSMRIoJEQCEZIechmE0hWHg7PmFL8wnvhBWPAxMkrEFI5uMDYJpSxXTgJsQ0vZUYCsQiza5dAaAW0jDSSZjSbZumZXqbv7bucc94f00NkyiSx41cvks6n6laXukY1Nae//bv3nPO7F5AkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIkSZIuakQOwb89RmvWrCFHjhwhs2bNIgAwe/ZscfjwYQEAjzzyiJj6wUceeYQcOXKEDA8P/8a4bt26VQA495Ckz0Xb29vV9vZ2VQjxB/mCEkI+PVatWqW0t7erAKgsAHIAzg0d3bJlCyOEfLZCJVpbW2sbG+saDcNsNgyjmnNRns/n447rmpxxjXFGfJ8xz3Vdy8pN5F1nNJfNjWcymeFUKtUN4Ezh6JuqgIRMDv0111yjFiokkwG8yP729vZ25bOhi0QiDSUlRQurqmrbm5ub5jY1NbbU19fHGhsaEYvFEAqFoKgqKKXgjINzDp8xeJ4Hz/OQyWTgui4sy0I6lcLI6AiGzg7hdHd3bmBgoHtwcPCj3t7eXb7vbwfwMQD+mTCyi+k0fTEGkK5atYp0dHR8WnG0kPZH0VD05pramhsaGxrntLXNM9va2jBj+gzEE3EYhsl/s0JxpMbTJDmWRDqVRs6ykJ3IwrZtuK4nXMeBEBCAIIZhIhQKUtMMKoGADsuycLr7NPbt3Ss6OzsPHz/e+ebQ0MiLAHYBAKUUK1euVDo6OgQALgN44VCwBgJrJz/UeDxeBeDWsrKyP505c+aChQsXKvPnz0dTUxOCoaAvhBCe6xEBQVRFJbqmET2ggwCwbBsTExOwLAu2nReOkyeWZcOycshO5JBKjSOTzmA8lUIul4PneULXdVGaKBWNjQ1i+vTpSCQSKmM+OXnyJDZv3oJdu3Z+uHfvnl86jt8B4OzFEsSLIYD007IFwDTNtnA4/PVZs2atWry4PXrllVehtrZWAPDHx8dJKpWmnueScDiMRCIhEok4IiUlJGiaoFQBOEc2N4FsNotUKoV83oHnurAsG4wzcM7hum7h1YPne/BcVziuC9/zwDkHCCGmYYjS0lLe3NwkKisqFcuy6O7338crr7wy+u677z43MDDwUwCd5wSRX4inZnKBB48AYIQQBIPFS4qKgvdedtncG1esWEHmzp0LIYR34kQX7R/oJ5xxUlFRjoaGBlRVVSEUCsF1XaTTKTGWHCNjySSGh4cwOjpKunt6RH//AIZHRmHlcvB9RhhnU/EQhBLomg4zaKK4uBiJREJUVVeRmuoaNNTXo7q2GpHiCBjzRWo8RRzXRTRawhoaGkU4FNIOHzmM5557zn799U3PHT/e9XcADlNKwa/mKrbigrpGvBADSAAoAHxCCBRFuToeL/3rRVdf9aWv3HYbGhsbRV9fn3/gwEGaHBsjpaUJMmPGDNTX1UHXdQydHcLRo0dx5OhR9Pf3Fa7xcpjITiBnWbBtm3i+LxhjBEIIzjmEKCRvctlGCCEmK10hJ4qqQqEKgsGgKC0t5XW1tZg+fRqdM2cOZra2kurqami6JrKZLCgloq6ujoVCYf3YsaN45pln8hvWb/jHM729jwE4QwiFEFy5UGbNF1oAlamKJzRteiwUfnjR1Ytuv/POO9HQ2MgOHTokPvhgD2W+T1pbW8W0aS3QNI30nukVe/ft5QcPHiRnes4o2Yms4FyAMQaqUFBCETACMA0ThhEghmkKXdOgaho0VYMQHFxwcMbheR4c1wXzfbieh2w2i2w2CwhACE4opVAUBYFAAJHiYlZRUSmam5vovHnz0LZgPqa1tMA0TRACEQ4XMwD6wYMH8XdPPpn8P//8z993XfcpSmnuoYceomvXrsX5fn1ILqCqRwkhLJFIhFOZzANt8+bd/z/uuis8Z84c/uGHH/Jd739Ai8IhMnvWbMQTcQydHeIffPC+2PPBB+TMmV7Fsm0QQkAphaqqQtM0zL1sLhobG9HY0IiKinLE43EUFxURwzDF5FIMAQHguC7y+Tzy+Tyy2QlMTGQxPDyM8VQKfb29eOedd3k0FlV6urv3g2OXIOIyQsh0SmnCMAwUhcKIxaKsoqJCNLe00KuvuQZLly4lFRUVAuBwXZ/5vq+9/fZbePLJJzu3bNn6EIAOSik45yoAXwbw/3PVK3wYN0+bNu2x1atXz/ziF7+IzuPHve3btyvxWJzMvuQSwTwPH+79kG/dspV0Hu9UbMsGCEApHRNCfMI53x2Nxf5reVl5g88Y+193301bW1vF0WPHSGp8HKqqQggOxjh0XQdjDL7vw/d9uK4L32fwmQ/btnHpF/5IGIaJU6dPkWf/8VlWV1en7t9/YKPnOQ8CiChQSolKZnPOryKEXKGqakVxcTFKEwmUlZZ61dU1dP4VC8jy5ctJZWWl6Dx+nJumyXVN059//nn85Cc/Xt/b2/fXhJAuzjkhk4uJ5101VM/3az1CiC+EKA0Gg4/fcustd951112wLNvtWL9BjcaiyrLrlpHx8XHx0oYNbNu2berQ0JAqhAClNEUVuo8xtksIsZ8QclYIkQuFim4uKysFVVTMnj1LVFVW4vnnn8fhI0ew4pbliEaj6DlzBq++9irxfSYcJw/X9cAZI67nQVNVMTg0hAcfuJ8sWLBAAAJFxUUikYhD13Xuec64aZoWIaTfsqzDAF4FUEsImT+aTF6XHBtbeHZoSM9mshgY6Pfe+PWvlfbF15KVK1fQbCZLT5465S2/5RaydMmSL//ghz/8L7/61a/+lhDyBKWUF6rheTVJUc/nqlcI342XXHLJj/7ynr+sb22d7e/e/QEBhHrVlVeS3t4z/Mc/fprv3LFTnchNUEVROKHkAAQ2CyZ2MbDTACxVVb1QKOSOjY35xUVhUVNTA8/zMH36NBItKRElkQhqa2rwzfvug2EYyOfzOHz4CE53d0NMfdSF3QxFVVESiaA4EkEsHieBQAChcBjFkQh0XRW5HMZt26YAeH19vZZKpQzP8zKWZXUCeFnVtC+k0+nr9x08cH0sGou1NDXhtZdf9je/9y5dsXIl5rW10QMHDhHTNLzvfve7kWXLrnv80Ue/e3NXV9f9hJA9hQkRPV+q4fkYQLUQvJBpmo+tWLHi7ttvvx1Dw8Pe7t271eamJjEw0M+/9/jjZPf7uxXHcaCqWlJVlO2M8zc45x8DSAcCgXxACViGYeTGxsby3/72t/21a9fSokgxLy8vRzabRW1tNQAFPmOwLRupVBqGkS9MLiYwMjICSigYZxAC4JwV/s0RNE1RVVGBnGWRcDCERDwOXddxToXiPT09DEAeQLampkZPp9OW7/sp27bfDwQCv0in0rft2bdvRWVFeUlLczP/h5/9TGza9Dr52tfuIOFQSH3zzbf5/Plt/IUXXlj06KOP7li/Yf0PAKwDYBXOEEIG8A880aCU+pzzK1paWn529913XzJjZqt/preXFIXDiqap7PtPPEH2H9ivTgZPPaUoymtCeO/5DD26rtuU0ryiKHY0Gs329fU5lmVxAGTdunUCAIpCYRIKBWHbtrAsW3Au4DouhkdGsGPHDpSWluLs0Fn09/cJ3/dBQCAgMLk8AlCFQlUUhEIhVFdXI5VOIRgMoqQkClXXlc/521hfX58NwG5paQmMjIyYvu8fcohzTOf6hrNDw6tHx8ZvndHSoowOD/O/+Zv/jRtuuF5cf/0NOHHihFJbW+M/9dRT6pIlS/7qiSeeWJZMJr+eTqf3nw+V8HwKoADAOOf3LFq06Hv3P/CAXlxU7I0kk9TJ2+KXv/g53b1rt8o4g67rBxRFecX3/R0AhnRdz+u6YhuGkW0aH7f2AX4ul/tt1YFqukZ8z4eVs8iJEycJAJFKp5BMJvGtbz0Iz3NJ3nEEY4wQQoQQYjJ0qgJAgabp4IyDEEJUTROqqkJTNZimCVVRlHN2Zn6rrq4uB4ADQInH40HHcfZQSg8LIV4/cuzof4/H4vM45/SjQ4fIl1euFNFoFCdPnlLS6TTq6uoszsUcx3HuBLCvcKkiA/gHqHzk0vr64hHPe+r222//6v333e919/Q4u3btUjdu3Khs374dQnCh6/puwskGzvkuhbExNRBwVFW1i4uLs4ODg65t2/6+f+OX+b6PdCYDy7bQ29cH3/NJOp0hlm0JIxAgrut++nUQEFCoAk1VETAMUEIRCgYBcDI8PCw+/vhj5B0HjuPAdV18umL978OSyWS2paXFTafT+Rf+4i9+ce3atcV5x5lz773f0JcsWSJeWL+eZLMTZMGC+WLH9u3sBz98MpjP2++Xlpb+bT6fp+fDYvX5EEAFgH82l1sZS5R+1bZsPPzww9rBQwexb+8+MM4ymqbtpFR7lTG2n1I6Ril19WAwm8lkso7jfF61+20oZ4zadh6WZWF0NFloOsgJz/WgKqrgQpDJ/VxAVRTouo6AYSAUCkGliojFoiAQsGwb3d09BIRgwppAdmICjP1OeVDWrFkj1q1b55SUlBjLHnvs6SVLl/75vd/4Bnc9D0//+CekqKgIS69dzN955x3+Tz//uUop3RmPx78eCATShS8ulwH8j2MAiKLrG8/0nmn60dM/uhyADmCUUvqxrusHXdftxmSz50R7e7timqZ44403vN/nA/AZg5234boe0uk0xsbGkXccTG25UUJBlMkZr6ZqCAZDiEZLECspgaIqiMViYMxHIBCAGTTh+z7ytkPyeRtC/Oun36kvwZo1a7Bu3TpW2On4k/Ly8kdXr/6z5muvXcy3btsudu7cSWfPnoXamhrxzDM/w7bt21RV1V4jBA9ZlpVVVVXOgv/A13646qqrUtnsgXUffWSVOY4T9DyPeZ6XF0IosRjGg8GaGxfOn886XnzxRQCeoihYtGiRunXrVv47fBjE93ySzzvwPBe2bSOdScPzPEIpFYQSEEFAQUEVioAeQHFRGHVVlaipqhSRSDEMM4hsJiNCwSDisZhIjo0Tz3fheT6E+PyF/1WAMmvNGrF27VpeCN7V9Q0ND998081//JXbbkM6k/F++dzzCiDITTdej/6+fvad73xH7e3thaZpT8PzfkoDgYlwOJweGhqyz5e1wPNmEtLR0SEqKyuVfD6f4ZxnCSEoLi72KKViYGDALisrGx1Npd948MG/Onns2OGfvPLKa89t3bp1mFIKxhg9Z6dA/KsBZIxMdjf7cB0HtmUJ3/cJVSgIoaBEQNM1BAIBYRomIpESlJUm0Dq9BS1NjQiFi9Db349QKIiSkhKkMxkILsAZA6XkswGk7e3tdNu2bX6HEAyTwbuqurr2/qVLr7119erVqKioYJu3bEFvb59yxYL5CAR0sWH9Bv7iiy+qecdJqqr6uOd5LxuGkY9EIqNDQ0OWXIj+f4MPDg5a576RTqcLa8BEB/DW5vfevXVkeGT9HXd89fuLFy+576WXXnph+/btzxFC9k/dFFTorcPnhJEy3yee64IxDs/3J2e9+bzITUzA930iuIDmqsR3PfiuJxRKcLpHQT6fx5m+fhKLx0Q6NY6icAiGEYCqKBBisrGBECgAlMsvvxxNTU2ko6ODFSq0AmBZfUPD/7z66mtuvP32P8Ws1lb2ySeH+aZNr6vNLc2YO2eO2LJlC/+nZ5+lxzo7FULIHkVRvuf7/iemaeZKSkrGBgcH8zjPWrUupG4YfdWqVUpHR8cS3TCfXH3nnS0rV65E5/FOtnHjS5vfefudXwDYBGDsM2GcaqHihBBz7mWXHYxESqZlMxl23bLr6PHjJ8AZg+f7CIdCCAQMYhgB6LoudF1HcVERQuEQYtEootESmMEgNFXFzJkzIYQQA4OD5L999Wusbd48dcuWLW8NDPQvO2cy3GgYxpdnzJjxlcWLF8+96aabUF1dzU+eOsXO9JxRKisr0NzcTLpOnBD/8Pd/z9/d/J6azzt5RVF+SRh7luoYVVVkLQtjmGxIOO/2gi+0dixjxowZ2smTJ2f4vv+d+vqGZd+875tYdt0yfPTRR9i48aXBvXv2vH7i5MlXAOwEkJwKIwDE4/FwRWXl/lg0Nq2rq4t964EH6PGuLliWBULI5JKLriMYDCIYNBEOhZBIxFFaaDitrqpGIhEXqqZPjavYsnkzueXWFezm5cvVt95+642hwcE/o5ReV1dXt3zWrFl/vGzZdeErrlgIXdf9g4cOiVOnupXm5kbMam0lo6NJvmH9evHaq6+owyOjIJTsAfBTzvneQAATwWB0bHx8fALncW/ghdiQqkcikWAwGCweHBy8E8C9l18+L3rPPfc48+bNC5w9exY7dm7Hgf0Hhjo7O7d3dna+xznfCaATgPOFOXM/qa2unr1p02ts4cKF9NI5c6Bp2mTozCAMI4BQKIxQKIhgMChCwSDMoEni8TiiJSXQNF1QhZJ83sHJrhPikUceIXv37kfb/DaMjoykp02fLq5YsCC6cOFCVFVXY3R01Dtw8AAdHU2S2to6NDc1ksHBQf7r1zeJ997bog4M9IMLMQBKfy4IeQ2+nzIMI5vP50cAuJD9gP851w4jkUiRaTItmxVzcrncNylVvjR/fhvuuONrzvwFCwhjTB8eHsLxzuP45JOPRU9PT/fp06cP+IxfEw6FEkePHuHnjo+iKDACASiKSgzTELquQ6HKb+y4Ms7AGYOiKjALa4MtLc2Y3zZfNE+bRlpnzCRlFeXwfN/r6e5BV1eX4nkeqqqrSDgUFseOHRWvb3pdbNu2TR0ZHQWADKX0ZQAbGGOnA4ClhcOpiYmJTCF8570L+Z4QUl5eHrQsy6CURvL5/HWO4/y5pmpzL730C/jS9Tf4ixYt8uOJhJLNZNRMJkMymTTGx1MYGRkWyeQYRkdHkEwmkclkkM1mwRmH67qEMV8IgKiqKnRNQygUQlFREcrKytDQ2Ijp06dhWss0NDU1oaysDIZpCgDEsnJ86OxZZCcmCCGUUErEyMgodu3Yyd988w3y8SefKKlUGiBkDJS8TYR4hXPeCcAyTTNdYtupwcngXTD3hVwMd8VpkUgk7Pu+LoSo8H1/meu6f6JQ5fLGpgYsXHgl2tra/NLSUu77PjLZrOq4LgloOoqKwiIcLoJhBAilitBUlbieSxzHERCApmuglELT9MlTczAITdcEpQohhEDXNGEYARIuCotgKATOONLpDHp7e/HRwUNi584dfOu2bVp3dw985gGE9kCQNynF24yxkwCcAGCFYhgbG4NdmGhcUHfGXTT3BdfX1xvJZDLM2ITu+1opQBd4nrMcwNWmYRQ1NjZi9uxL0NTc5JeUlEDVNKKqKlEUBaoyufVh2zbGx8dJKp0WlmVDCA5N02AaJmLxGBKJBBLxOMrLy1BWVoaSkqhQVQWZTAa9Z3pF57FjYv/+fdi3f796+tRppNJpcCFsSukhIcQ7lNLdjLGBwuk1FwEy6cnWqt9rV0cG8D8fWlODQCoVDjE2EWBMDwOY6XneYiHEYgCtBCQQjZWgsrIKtTU1qG+oZ2Vl5SIWjUIPBEApJYU2fAJA6JoGTdeJYZjQVFUICFhWToyOjGKgvx9DQ0Okr69X6e3rRzKZhGXbEELkAXQSQnYTQj7gnHcBSEOHZ7jIBSLIptOwztelFRnAf8ckpaYGejqNoO/DsG2YmqZFAEznnM9hjF0GYCaAcgAaAOiaDsMwoOuTr2rhpiQU+gE5Y3BdF67rwrbzcF0HjLGp86UNYADAKULIx4WjmzGWAuDqgKcGMWEYyI2NIV+4xrsoHlZ0sT8di0wu2yDo+9BZDoH85K5EkaIo5ZTSKkJIHWOsSnBRLiDKhBAhACEARiGcU2PoYbK7eQIg44QgCWCIENKvKMoA53yQEZKG77uY7PfzDCCvFcEKZ2FfaJMLGcDffRxoDaBngYAPBBg+DaNe+JkAAENVVUUIYWJyG3MqgKRwuswTQjwAnj8ZNHbO9RsD4AcBRwPs9OT7XuF9jov0wZUygJ8TRgBKDaD0AYFigGYmg6gVgqJNnco/83+n7s/lJuATgCuApwHe2L+E7aIOnAzg7z9OU8FE4XXqOPexuwz/sjQ99R6HfDSvJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEmSJEnSxe7/Ao0rq9pohSTYAAAAAElFTkSuQmCC" />
@@ -659,7 +631,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     // === GLOBAL ERROR HANDLER (console only) ===
-    function dbg(msg) { console.log('[DBG]', msg); }
     window.onerror = function(msg, url, line, col, error) {
       console.error('ERROR L' + line + ': ' + msg);
       return false;
@@ -912,8 +883,6 @@
             const texture = new THREE.Texture(img);
             texture.needsUpdate = true;
             colorTargetTextures[name] = texture;
-            console.log(`${name}zielhit.webp loaded`);
-            dbg(name + 'zielhit.webp OK');
             resolve();
           };
           img.onerror = () => {
@@ -922,7 +891,6 @@
               setTimeout(() => loadImg(attempt + 1), 500);
             } else {
               console.error(`${name}zielhit.webp failed after 5 attempts`);
-              dbg('<span style="color:orange">' + name + 'zielhit.webp FAILED</span>');
               resolve();
             }
           };
@@ -940,8 +908,6 @@
         const img = new Image();
         img.onload = () => {
           leerImage = img;
-          console.log('leernohit.webp loaded');
-          dbg('leernohit.webp OK');
           resolve();
         };
         img.onerror = () => {
@@ -950,7 +916,6 @@
             setTimeout(() => loadLeer(attempt + 1), 500);
           } else {
             console.error('leernohit.webp failed after 5 attempts');
-            dbg('<span style="color:orange">leernohit.webp FAILED</span>');
             resolve();
           }
         };
@@ -965,8 +930,6 @@
     
     Promise.all(imageLoadPromises).then(() => {
       texturesReady = true;
-      dbg('All textures ready');
-      console.log('All textures ready');
       checkEnableButtons();
     }).catch(() => {
       console.error('Some textures failed to load');
@@ -1277,7 +1240,6 @@
       
       // Direkt zu Scene hinzufügen
       scene.add(spieltisch);
-      console.log('Spieltisch loaded at fixed position:', xCenter, yPos, zCenter);
     });
 
     // =========================
@@ -1571,8 +1533,6 @@
     }
 
     function checkEnableButtons() {
-      console.log('checkEnableButtons: texturesReady=', texturesReady, 'loadingAnimDone=', loadingAnimDone);
-      dbg('checkEnable: tex=' + texturesReady + ' anim=' + loadingAnimDone);
       if (texturesReady && loadingAnimDone) {
         document.getElementById('btnSpielen').disabled = false;
         document.getElementById('btnSpielen').style.opacity = '1';
@@ -1637,7 +1597,6 @@
       const ccw = { f2: 'f1', f1: 'f0', f0: 'f2' };
       const oldFace = topFace;
       topFace = (kippDirection === 'cw') ? cw[topFace] : ccw[topFace];
-      console.log('advanceTopFace:', oldFace, '→', topFace, 'dir:', kippDirection, 'Q:', currentQuadrant);
     }
 
     // Welche Nachbarfarbe hat jeder Slot pro Quadrant
@@ -1903,7 +1862,10 @@
     
     function showGameEnd() {
       gamePhase = 'ende';
-      swHide(); swStopLive();
+      isDemoAnimating = false;
+      handDemo.visible = false;
+      stopCountdown();
+      if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
       setButtonsDisabled(true);
       document.getElementById('richtungButtons').classList.add('hidden');
       kippButtons.classList.add('hidden');
@@ -2078,7 +2040,6 @@
 
     function startPausePhase() {
       gamePhase = 'pause';
-      swHide(); swStopLive();
       pauseExiting = false;
       document.getElementById('kippTarget').style.display = 'none';
 
@@ -2350,106 +2311,6 @@
     let spielenLiegezeiten = [];    // Alle Liegezeiten in SPIELEN (ms)
     let lastKippLandTime = null;    // Zeitpunkt des letzten Kipp-Landens in SPIELEN
 
-    // === Stoppuhr-System (empirische Erfassung) ===
-    let swKippStartMs = null;    // Zeitpunkt: Kipp beginnt (Drag aktiviert)
-    let swLandMs = null;         // Zeitpunkt: Kipp landet
-    let swKippDurations = [];    // Kippdauern in ms (Ecke-zu-Ecke)
-    let swLiegeDurations = [];   // Liegezeiten in ms (ab erster Berührung)
-    let swKippNr = 0;            // Kipp-Zähler
-    const SW_MAX_KIPPS = 36;     // Ziel-Anzahl Kipps
-    let swFinished = false;      // true wenn 36 erreicht
-
-    function swShow() {
-      const el = document.getElementById('kippStopwatch');
-      if (gamePhase === 'kippen' || gamePhase === 'spielen') {
-        el.style.display = 'block';
-      }
-    }
-    function swHide() {
-      document.getElementById('kippStopwatch').style.display = 'none';
-    }
-    function swUpdate() {
-      const el = document.getElementById('kippStopwatch');
-      if (swFinished) return; // Summary bleibt stehen
-      let lines = ['#' + swKippNr + '/' + SW_MAX_KIPPS + '  Q' + currentQuadrant];
-      if (swKippDurations.length > 0) {
-        lines.push('Kipp: ' + swKippDurations[swKippDurations.length - 1] + 'ms');
-      }
-      if (swLiegeDurations.length > 0) {
-        lines.push('Liege: ' + swLiegeDurations[swLiegeDurations.length - 1] + 'ms');
-      }
-      // Live-Liegezeit wenn Würfel liegt
-      if (swLandMs && !swKippStartMs) {
-        const live = Math.round(performance.now() - swLandMs);
-        lines.push('⏱ ' + live + 'ms');
-      }
-      el.textContent = lines.join('\n');
-    }
-    function swShowSummary() {
-      swFinished = true;
-      swStopLive();
-      const el = document.getElementById('kippStopwatch');
-      el.classList.add('sw-summary');
-      el.style.display = 'block';
-
-      const avgKipp = swKippDurations.length > 0
-        ? Math.round(swKippDurations.reduce((a,b) => a+b, 0) / swKippDurations.length)
-        : 0;
-      const avgLiege = swLiegeDurations.length > 0
-        ? Math.round(swLiegeDurations.reduce((a,b) => a+b, 0) / swLiegeDurations.length)
-        : 0;
-      const minKipp = swKippDurations.length > 0 ? Math.min(...swKippDurations) : 0;
-      const maxKipp = swKippDurations.length > 0 ? Math.max(...swKippDurations) : 0;
-      const minLiege = swLiegeDurations.length > 0 ? Math.min(...swLiegeDurations) : 0;
-      const maxLiege = swLiegeDurations.length > 0 ? Math.max(...swLiegeDurations) : 0;
-
-      let txt = '══ MESSUNG FERTIG ══\n';
-      txt += SW_MAX_KIPPS + ' Kipps gemessen\n\n';
-      txt += '─── Kippdauer (Ecke→Ecke) ───\n';
-      txt += '  Ø ' + avgKipp + 'ms\n';
-      txt += '  Min ' + minKipp + 'ms  Max ' + maxKipp + 'ms\n\n';
-      txt += '─── Liegezeit ───\n';
-      txt += '  Ø ' + avgLiege + 'ms\n';
-      txt += '  Min ' + minLiege + 'ms  Max ' + maxLiege + 'ms\n\n';
-      txt += '─── Alle Kippdauern ───\n';
-      for (let i = 0; i < swKippDurations.length; i += 6) {
-        txt += '  ' + swKippDurations.slice(i, i+6).join(', ') + '\n';
-      }
-      txt += '\n─── Alle Liegezeiten ───\n';
-      for (let i = 0; i < swLiegeDurations.length; i += 6) {
-        txt += '  ' + swLiegeDurations.slice(i, i+6).join(', ') + '\n';
-      }
-      el.textContent = txt;
-
-      console.log('[SW] ══ MESSUNG FERTIG ══');
-      console.log('[SW] Kippdauern:', JSON.stringify(swKippDurations));
-      console.log('[SW] Liegezeiten:', JSON.stringify(swLiegeDurations));
-      console.log('[SW] Ø Kippdauer:', avgKipp, 'ms | Ø Liegezeit:', avgLiege, 'ms');
-    }
-    function swReset() {
-      swKippStartMs = null;
-      swLandMs = null;
-      swKippDurations = [];
-      swLiegeDurations = [];
-      swKippNr = 0;
-      swFinished = false;
-      const el = document.getElementById('kippStopwatch');
-      el.textContent = '';
-      el.style.display = 'none';
-      el.classList.remove('sw-summary');
-    }
-    // Live-Update alle 50ms
-    let swLiveInterval = null;
-    function swStartLive() {
-      if (swLiveInterval) return;
-      swLiveInterval = setInterval(() => {
-        if (swLandMs && !swKippStartMs) swUpdate();
-      }, 50);
-    }
-    function swStopLive() {
-      if (swLiveInterval) { clearInterval(swLiveInterval); swLiveInterval = null; }
-    }
-
     // UI für Demo-Phase initialisieren
     hintText.textContent = ''; // Leer lassen - Text-Sequenz übernimmt
     actionButton.style.display = 'none';
@@ -2459,16 +2320,16 @@
     let isDemoAnimating = false;
     
     function startCountdown(onFinish, maxTime) {
-      let timeElapsed = 0;
-      countdown.textContent = timeElapsed;
+      let timeRemaining = maxTime;
+      countdown.textContent = timeRemaining;
       countdown.style.display = 'block';
       countdown.style.left = '180px';
       
       countdownTimer = setInterval(() => {
-        timeElapsed++;
+        timeRemaining--;
         totalObservationTime++;
-        countdown.textContent = timeElapsed;
-        if (maxTime && timeElapsed >= maxTime) {
+        countdown.textContent = timeRemaining;
+        if (timeRemaining <= 0) {
           stopCountdown();
           countdown.style.display = 'none';
           if (onFinish) onFinish();
@@ -2651,13 +2512,6 @@
       demoLoop();
     }
     
-    // Demo starten nach kurzer Verzögerung (reduziert)
-    setTimeout(() => {
-      if (gamePhase === 'demo') {
-        startDemoAnimation(); // Texte erscheinen automatisch bei Wobbles
-      }
-    }, 600);
-    
     // === PHASE 1: SPIEL ZIEL ===
     // Farbnamen für Tutorial-Anzeige
     var FARB_DISPLAY = {"violett":T.fV,"blau":T.fB,"gruen":T.fG,"orange":T.fO};
@@ -2767,10 +2621,7 @@
         img.dataset.kniffIdx = i;
         jokerRow.appendChild(img);
       });
-      console.log('Joker icons populated:', jokerRow.children.length);
-      dbg('Joker icons: ' + jokerRow.children.length + ' added');
     } catch(e) { console.error('Joker icon setup error:', e); }
-    console.log('=== Joker icons setup complete ===');
 
     async function showSubtitle(text, duration) {
       duration = duration || 2000;
@@ -2848,7 +2699,6 @@
     function autoRevealKippziel(zahl, colorObj) {
       erstesKippziel = { zahl: zahl, color: colorObj };
       const img = colorTargetImages[colorObj.name];
-      if (!img) { console.error('autoReveal: Missing image for', colorObj.name); dbg('<span style="color:red">autoReveal FAIL: no img for ' + colorObj.name + '</span>'); return; }
       verdecktesCtx.clearRect(0, 0, 85, 170);
       verdecktesCtx.drawImage(img, 0, 0, 85, 170);
       const displayText = zahl + ((zahl === 6 || zahl === 9) ? '.' : '');
@@ -3061,8 +2911,6 @@
 
     // === MAIN AUTO-DEMO ORCHESTRATOR ===
     async function runAutoDemo() {
-      console.log('=== runAutoDemo START ===');
-      dbg('runAutoDemo START');
       autoDemoActive = true;
       gamePhase = 'autoDemo';
 
@@ -3140,16 +2988,12 @@
       // 1 TUTORIAL ROUND
       // ==========================================
       if (!autoDemoActive) return;
-      console.log('=== Starting tutorial round, shouldHit:', shouldHit, '===');
       await autoDemoRound(0, shouldHit);
-      console.log('=== Tutorial round DONE ===');
       if (!autoDemoActive) return;
 
       // ==========================================
       // TUTORIAL END — show d5a/d5b/d5c
       // ==========================================
-      console.log('=== Showing d5 subtitles ===');
-      dbg('Tutorial done, showing d5 sequence');
       document.getElementById('kippTarget').style.display = 'none';
       tapIndicatorA.mesh.visible = false;
       tapIndicatorB.mesh.visible = false;
@@ -3186,7 +3030,6 @@
 
       jokerRow.style.display = 'block';
       jokerRow.style.opacity = '1';
-      dbg('Joker icons shown, count=' + jokerRow.querySelectorAll('img').length);
 
       await showSubtitle(T.d5c, 4000);
       if (!autoDemoActive) return;
@@ -3200,8 +3043,6 @@
 
     // === Single demo round ===
     async function autoDemoRound(roundIdx, shouldHit) {
-      console.log('autoDemoRound START, round:', roundIdx, 'hit:', shouldHit);
-      dbg('autoDemoRound r=' + roundIdx + ' hit=' + shouldHit);
       if (!autoDemoActive) return;
 
       activeCardIdx = roundIdx;
@@ -3242,8 +3083,8 @@
       // ==========================================
       eyeIcon.style.display = 'none';
 
-      // Show "0" (counter replaces eye)
-      countdown.textContent = '0';
+      // Show countdown start value
+      countdown.textContent = '30';
       countdown.style.display = 'block';
       countdown.style.top = (parseInt(timerTopPos) + 45) + 'px';
       countdown.style.left = '180px';
@@ -3342,15 +3183,12 @@
       // ==========================================
       // 5) AUTO-"CLICK" KIPPZIEL → REVEAL
       // ==========================================
-      console.log('Round ' + roundIdx + ' after SCHAUEN: Q=' + currentQuadrant + ' face=' + topFace);
 
       const erfuellteKombis = getCurrentErfuellteKombis();
       let kz = generateNeueKombiOhne(erfuellteKombis);
       if (!kz) kz = generateNeueKombiOhne(new Set());
       if (!kz) { console.error('No kombi available!'); return; }
 
-      console.log('Revealing Kippziel:', kz.zahl, kz.color.name, 'img loaded:', !!colorTargetImages[kz.color.name]);
-      dbg('Reveal: ' + kz.zahl + ' ' + kz.color.name + ' imgOK=' + !!colorTargetImages[kz.color.name]);
       autoRevealKippziel(kz.zahl, kz.color);
       bereitsAusgegeben.add(kz.zahl + '_' + kz.color.name);
 
@@ -3397,7 +3235,6 @@
       // 8) SOLVE & TAP
       // ==========================================
       const solution = solveKippziel(kz.zahl, kz.color.name, currentQuadrant, topFace);
-      console.log('Round ' + roundIdx + ' solution:', solution, 'for', kz.zahl, kz.color.name);
 
       if (!solution) {
         console.error('No solution found!');
@@ -3475,10 +3312,7 @@
       isReplay = true;
       initSpielzielPhase();
     });
-    console.log('=== Registering btnDemo click handler ===');
     document.getElementById('btnDemo').addEventListener('click', () => {
-      console.log('btnDemo CLICKED, texturesReady:', texturesReady);
-      dbg('TUTORIAL clicked, texReady=' + texturesReady);
       if (!texturesReady) return;
       runAutoDemo();
     });
@@ -3580,7 +3414,7 @@
       e.stopPropagation();
       e.preventDefault();
       if (gamePhase === 'entscheidung') {
-        if (activeCardIdx === 0 && !isReplay) {
+        if (activeCardIdx === 0) {
           spielzielToDemoPhase();
         } else {
           startFreeSchauenPhase();
@@ -3593,7 +3427,7 @@
     eyeEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (gamePhase === 'entscheidung') {
-        if (activeCardIdx === 0 && !isReplay) {
+        if (activeCardIdx === 0) {
           spielzielToDemoPhase();
         } else {
           startFreeSchauenPhase();
@@ -3649,6 +3483,17 @@
       verdecktesMesh.userData.revealed = false;
       drawLeernohitOnVerdecktes();
       
+      // Alte Animation stoppen, Hand zurücksetzen
+      isDemoAnimating = false;
+      handDemo.visible = false;
+      
+      // Cube sicher zurück in kipGroup
+      if (cube.parent !== kipGroup) {
+        const oldP = cube.parent;
+        if (oldP) oldP.remove(cube);
+        kipGroup.add(cube);
+      }
+      
       // Würfel resetten für Demo
       cube.quaternion.set(0, 0, 0, 1);
       cube.position.set(-offset, offset, 0.109375 + offset);
@@ -3658,8 +3503,8 @@
       // Demo starten
       startDemoAnimation();
       
-      // SCHAUEN-Timer: nur "00" anzeigen, startet erst bei erstem Kipp
-      countdown.textContent = '0';
+      // SCHAUEN-Timer: Anfangswert anzeigen, startet erst bei Touch
+      countdown.textContent = '30';
       countdown.style.display = 'block';
       if (timerTopPos) countdown.style.top = (parseInt(timerTopPos) + 45) + 'px';
       countdown.style.left = '180px';
@@ -3948,7 +3793,7 @@
       if (vkRaycaster.intersectObject(verdecktesMesh).length > 0) {
         if (gamePhase === 'entscheidung' && !verdecktesMesh.userData.revealed) {
           // Kippziel-Klick = Auge-Klick: Schauen/Demo starten
-          if (activeCardIdx === 0 && !isReplay) {
+          if (activeCardIdx === 0) {
             spielzielToDemoPhase();
           } else {
             startFreeSchauenPhase();
@@ -3970,7 +3815,7 @@
       if (!verdecktesMesh.visible) return;
       if (vkRaycaster.intersectObject(verdecktesMesh).length > 0) {
         if (gamePhase === 'entscheidung' && !verdecktesMesh.userData.revealed) {
-          if (activeCardIdx === 0 && !isReplay) {
+          if (activeCardIdx === 0) {
             spielzielToDemoPhase();
           } else {
             startFreeSchauenPhase();
@@ -4002,7 +3847,6 @@
       
       // 6-Kipp-Regel: mehr als 6 = auto-miss
       if (kippCount > 6) {
-        console.log('=== AUTO-MISS: mehr als 6 Kipps ===');
         drawKippzielBorder(false);
         return;
       }
@@ -4023,12 +3867,6 @@
         isHit = (neighborColor === erstesKippziel.color.name);
       }
       
-      console.log('Ziel:', erstesKippziel.zahl, erstesKippziel.color.name);
-      console.log('topFace:', topFace, 'Q:', currentQuadrant, 'kippCount:', kippCount);
-      console.log('Sichtbare Slots:', JSON.stringify(visible));
-      console.log('hitSlot:', hitSlot);
-      if (hitSlot) console.log('Farbe an Slot:', SLOT_NEIGHBOR_COLORS[currentQuadrant][hitSlot]);
-      console.log('Ergebnis:', isHit ? 'TREFFER' : 'MISS');
       
       drawKippzielBorder(isHit);
     }
@@ -4181,8 +4019,6 @@
 
     function startFreeSchauenPhase() {
       gamePhase = 'kippen';
-      swReset(); // Stoppuhr für neue Runde
-      swStartLive();
       
       // Ensure timerTopPos is set (skipped when isReplay bypasses spielziel)
       if (!timerTopPos) timerTopPos = '553px';
@@ -4193,8 +4029,8 @@
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
       
-      // Timer "0" anzeigen und starten (60 Sek max)
-      countdown.textContent = '0';
+      // Timer bei 60 beginnen und abwärts zählen
+      countdown.textContent = '30';
       countdown.style.display = 'block';
       if (timerTopPos) countdown.style.top = (parseInt(timerTopPos) + 45) + 'px';
       countdown.style.left = '180px';
@@ -4203,7 +4039,7 @@
         if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
           revealVerdecktesKippziel();
         }
-      }, 60);
+      }, 30);
       
       // Würfel bleibt wo er ist - KEIN Reset!
     }
@@ -4223,6 +4059,7 @@
       
       schauenFromSpielen = true;
       gamePhase = 'demo';
+      isDemoAnimating = false; // Alte Animation stoppen
       
       // UI ausblenden
       document.getElementById('eyeIcon').style.display = 'none';
@@ -4232,6 +4069,13 @@
       tapIndicatorB.mesh.visible = false;
       stopCountdown();
       countdown.style.display = 'none';
+      
+      // Cube sicher zurück in kipGroup (falls in PivotGroup)
+      if (cube.parent !== kipGroup) {
+        const oldP = cube.parent;
+        if (oldP) oldP.remove(cube);
+        kipGroup.add(cube);
+      }
       
       // Cube zurücksetzen auf Q3 (wie im Tutorial)
       cube.quaternion.set(0, 0, 0, 1);
@@ -4258,7 +4102,7 @@
       actionButton.style.display = 'none';
       stopCountdown();
       countdown.style.display = 'none';
-      if (activeCardIdx === 0 && !isReplay) {
+      if (activeCardIdx === 0) {
         document.getElementById('instructionText').style.display = 'block';
       }
       document.getElementById('tutorialText').style.display = 'none';
@@ -4269,7 +4113,7 @@
           gamePhase = 'kippen';
           revealVerdecktesKippziel();
         }
-      }, 60);
+      }, 30);
       verdecktesMesh.visible = true;
       verdecktesMesh.userData.revealed = false;
       verdecktesMesh.scale.set(1, 1, 1);
@@ -4310,13 +4154,19 @@
       autoDemoActive = false;
       schauenFromSpielen = false;
       const aovReset = document.getElementById('auswertungOverlay'); if (aovReset) aovReset.remove();
-      swReset(); swStopLive();
       
       stopCountdown();
       if (autoEvalTimeout) { clearTimeout(autoEvalTimeout); autoEvalTimeout = null; }
       countdown.style.display = 'none';
       isDemoAnimating = false;
       handDemo.visible = false;
+      
+      // Cube sicher zurück in kipGroup
+      if (cube.parent !== kipGroup) {
+        const oldP = cube.parent;
+        if (oldP) oldP.remove(cube);
+        kipGroup.add(cube);
+      }
       
       document.getElementById('instructionText').style.display = 'none';
       document.getElementById('tutorialText').style.display = 'none';
@@ -4342,6 +4192,9 @@
       erstesKippziel = null;
       kippzielChecked = false;
       totalObservationTime = 0;
+      kniffsCount = 0;
+      spielenLiegezeiten = [];
+      lastKippLandTime = null;
       tapCount = 0;
       tapIndicatorA.mesh.visible = false; tapIndicatorB.mesh.visible = false;
       activeCardIdx = 0;
@@ -4524,7 +4377,7 @@
             if (gamePhase === 'kippen' && !verdecktesMesh.userData.revealed) {
               revealVerdecktesKippziel();
             }
-          }, 60);
+          }, 30);
         }
         
         // Touch-Punkt SOFORT für Drag-System speichern
@@ -4652,18 +4505,6 @@
           autoEvalTimeout = null;
         }
 
-        // Stoppuhr: Kipp startet (nur bis 36)
-        if (!swFinished) {
-          swKippNr++;
-          swKippStartMs = performance.now();
-          if (swLandMs) {
-            const liege = Math.round(swKippStartMs - swLandMs);
-            swLiegeDurations.push(liege);
-          }
-          swUpdate();
-          swShow();
-          swStartLive();
-        }
       }
 
       // Rotation live berechnen
@@ -4785,11 +4626,6 @@
             cube.position.copy(newPos);
             cube.quaternion.copy(newQuat);
             kipGroup.add(cube);
-            // Stoppuhr: Zurückgefallen, kein Kipp gezählt
-            if (!swFinished) {
-              swKippStartMs = null;
-              swKippNr = Math.max(0, swKippNr - 1);
-            }
           } else {
             // Gekippt: finalisieren
             finalizeKipp(finalQ, null);
@@ -4815,20 +4651,6 @@
               }, LIEGEZEIT_SCHWELLE);
             }
 
-            // Stoppuhr: Kipp gelandet
-            swLandMs = performance.now();
-            if (swKippStartMs) {
-              const kippDur = Math.round(swLandMs - swKippStartMs);
-              swKippDurations.push(kippDur);
-              swKippStartMs = null; // Reset für nächste Liegezeit-Messung
-              console.log(`[SW] Kipp#${swKippNr} → Q${currentQuadrant} | Kipp:${kippDur}ms | Liegezeiten:${JSON.stringify(swLiegeDurations)} | Kippdauern:${JSON.stringify(swKippDurations)}`);
-              // Nach 36 Kipps: Summary anzeigen
-              if (swKippNr >= SW_MAX_KIPPS) {
-                swShowSummary();
-                return; // Keine weitere Updates
-              }
-            }
-            swUpdate();
           }
           dragActive = false;
           dragPivotGroup = null;
